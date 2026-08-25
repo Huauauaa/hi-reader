@@ -22,4 +22,6 @@ export type BookSession = {
   setFontScale(n: number): void
   getFontScale(): number
   destroy(): void
+  attach?(el: HTMLElement, layout?: 'single' | 'double'): void
+  display?(page: number): void
 }

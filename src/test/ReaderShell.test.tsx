@@ -1,6 +1,6 @@
 import { render, screen, fireEvent, waitFor, cleanup } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
-import { describe, it, expect, beforeEach, afterEach } from 'vitest'
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { ReaderShell } from '../components/reader/ReaderShell'
 import { createTxtSession } from '../lib/readers/txtSession'
 import { progressStore, clearAllProgressForTests } from '../lib/progress/store'
@@ -133,5 +133,31 @@ describe('ReaderShell', () => {
     renderShell(session)
     expect(session.getCurrentPage() + 2 >= count).toBe(true)
     expect(screen.getByRole('button', { name: '下一页' })).toBeDisabled()
+  })
+
+  it('renders EpubView for an epub session', () => {
+    const attach = vi.fn()
+    const session: BookSession = {
+      format: 'epub',
+      title: '示例 EPUB',
+      getToc: () => [{ id: 'n1', label: '第一章', page: 0 }],
+      getPageCount: () => 2,
+      getPage: () => ({ type: 'epub', container: document.createElement('div') }),
+      goToPage: () => {},
+      next: () => {},
+      prev: () => {},
+      getCurrentPage: () => 0,
+      setLayout: () => {},
+      getLayout: () => 'single',
+      setFontScale: () => {},
+      getFontScale: () => 1,
+      destroy: () => {},
+      attach,
+      display: vi.fn(),
+    }
+    renderShell(session)
+    expect(screen.getByRole('heading', { name: '示例 EPUB' })).toBeInTheDocument()
+    expect(attach).toHaveBeenCalled()
+    expect(document.querySelector('[data-reader-page]')).toBeTruthy()
   })
 })

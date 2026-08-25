@@ -1,7 +1,7 @@
 import 'fake-indexeddb/auto'
 import '@testing-library/jest-dom/vitest'
 
-// ponytail: jsdom Blob lacks .text(); polyfill for store tests
+// ponytail: jsdom Blob lacks .text()/.arrayBuffer(); polyfill for store + epub tests
 if (!Blob.prototype.text) {
   Blob.prototype.text = function () {
     return new Promise((resolve, reject) => {
@@ -12,3 +12,15 @@ if (!Blob.prototype.text) {
     })
   }
 }
+
+if (!Blob.prototype.arrayBuffer) {
+  Blob.prototype.arrayBuffer = function () {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader()
+      reader.onload = () => resolve(reader.result as ArrayBuffer)
+      reader.onerror = () => reject(reader.error)
+      reader.readAsArrayBuffer(this)
+    })
+  }
+}
+

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { BookOpen } from '@phosphor-icons/react'
+import { EpubView } from './EpubView'
 import { FontPanel } from './FontPanel'
 import { ReaderToolbar, type ReaderPanel } from './ReaderToolbar'
 import { ThemePanel } from './ThemePanel'
@@ -110,9 +111,11 @@ export function ReaderShell({ session, bookId, initialTheme = 'dark' }: Props) {
         </nav>
       </header>
 
-      <main className="min-h-0 flex-1 px-4 pb-2 pr-16 md:px-16 md:pr-24">
+      <main className="flex min-h-0 flex-1 flex-col px-4 pb-2 pr-16 md:px-16 md:pr-24">
         {session.format === 'txt' ? (
           <TxtView session={session} layout={effectiveLayout} />
+        ) : session.format === 'epub' ? (
+          <EpubView session={session} layout={effectiveLayout} theme={theme} />
         ) : (
           <p className="p-8 text-sm opacity-60">该格式尚未接入阅读视图</p>
         )}

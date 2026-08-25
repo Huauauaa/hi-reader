@@ -5,10 +5,35 @@ import { ReaderPage } from '../pages/ReaderPage'
 import { progressStore, clearAllProgressForTests } from '../lib/progress/store'
 import { booksStore, clearAllBooksForTests } from '../lib/books/store'
 import type { BookMeta } from '../types/book'
+import type { BookSession } from '../lib/readers/types'
+
+const createEpubSession = vi.hoisted(() =>
+  vi.fn(async (_blob: Blob, title: string): Promise<BookSession> => ({
+    format: 'epub',
+    title,
+    getToc: () => [{ id: 'n1', label: '第一章', page: 0 }],
+    getPageCount: () => 1,
+    getPage: () => ({ type: 'epub', container: document.createElement('div') }),
+    goToPage: () => {},
+    next: () => {},
+    prev: () => {},
+    getCurrentPage: () => 0,
+    setLayout: () => {},
+    getLayout: () => 'single',
+    setFontScale: () => {},
+    getFontScale: () => 1,
+    destroy: () => {},
+    attach: vi.fn(),
+    display: vi.fn(),
+  })),
+)
+
+vi.mock('../lib/readers/epubSession', () => ({ createEpubSession }))
 
 const samples: BookMeta[] = [
   { id: 'sample-txt', title: '示例 TXT', format: 'txt', source: 'sample', filePath: 'books/sample.txt' },
   { id: 'sample-pdf', title: '示例 PDF', format: 'pdf', source: 'sample', filePath: 'books/sample.pdf' },
+  { id: 'sample-epub', title: '示例 EPUB', format: 'epub', source: 'sample', filePath: 'books/sample.epub' },
 ]
 
 const TXT = 'A'.repeat(900) + 'SECOND PAGE'
@@ -45,6 +70,9 @@ beforeEach(async () => {
       if (u.endsWith('books/sample.txt')) {
         return { ok: true, blob: async () => new Blob([TXT], { type: 'text/plain' }) }
       }
+      if (u.endsWith('books/sample.epub')) {
+        return { ok: true, blob: async () => new Blob(['epub-bytes']) }
+      }
       return { ok: false, status: 404, blob: async () => new Blob([]) }
     }),
   )
@@ -66,6 +94,12 @@ describe('ReaderPage', () => {
     renderRead('sample-pdf')
     expect(await screen.findByText(/PDF/)).toBeInTheDocument()
     expect(screen.getByRole('link', { name: '返回书架' })).toHaveAttribute('href', '/')
+  })
+
+  it('loads a sample EPUB end-to-end', async () => {
+    renderRead('sample-epub')
+    expect(await screen.findByRole('heading', { name: '示例 EPUB' })).toBeInTheDocument()
+    expect(document.querySelector('[data-reader-page]')).toBeTruthy()
   })
 
   it('restores saved page on load', async () => {
