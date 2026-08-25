@@ -1,0 +1,4 @@
+dist
+coverage
+public/books
+pnpm-lock.yaml

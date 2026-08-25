@@ -21,10 +21,18 @@ function pageListToc(numPages: number): TocItem[] {
   }))
 }
 
-async function pageForDest(pdf: PdfDoc, dest: OutlineNode['dest']): Promise<number> {
+async function pageForDest(
+  pdf: PdfDoc,
+  dest: OutlineNode['dest'],
+): Promise<number> {
   let explicit: unknown = dest
   if (typeof dest === 'string') explicit = await pdf.getDestination(dest)
-  if (!Array.isArray(explicit) || !explicit[0] || typeof explicit[0] !== 'object') return 0
+  if (
+    !Array.isArray(explicit) ||
+    !explicit[0] ||
+    typeof explicit[0] !== 'object'
+  )
+    return 0
   try {
     return await pdf.getPageIndex(explicit[0] as { num: number; gen: number })
   } catch {
@@ -32,7 +40,10 @@ async function pageForDest(pdf: PdfDoc, dest: OutlineNode['dest']): Promise<numb
   }
 }
 
-async function flattenOutline(pdf: PdfDoc, items: OutlineNode[]): Promise<TocItem[]> {
+async function flattenOutline(
+  pdf: PdfDoc,
+  items: OutlineNode[],
+): Promise<TocItem[]> {
   const out: TocItem[] = []
   async function walk(list: OutlineNode[]) {
     for (const item of list) {
@@ -48,12 +59,17 @@ async function flattenOutline(pdf: PdfDoc, items: OutlineNode[]): Promise<TocIte
   return out
 }
 
-export async function createPdfSession(blob: Blob, title: string): Promise<BookSession> {
+export async function createPdfSession(
+  blob: Blob,
+  title: string,
+): Promise<BookSession> {
   const loadingTask = pdfjs.getDocument({ data: await blob.arrayBuffer() })
   const pdf = await loadingTask.promise
   const last = Math.max(0, pdf.numPages - 1)
   const outline = (await pdf.getOutline()) as OutlineNode[] | null
-  const toc = outline?.length ? await flattenOutline(pdf, outline) : pageListToc(pdf.numPages)
+  const toc = outline?.length
+    ? await flattenOutline(pdf, outline)
+    : pageListToc(pdf.numPages)
 
   let layout: 'single' | 'double' = 'single'
   let fontScale = 1
@@ -69,7 +85,12 @@ export async function createPdfSession(blob: Blob, title: string): Promise<BookS
   async function paint(idx: number, canvas: HTMLCanvasElement, scale: number) {
     paints.get(idx)?.cancel()
     let cancelled = false
-    const entry = { scale, cancel: () => { cancelled = true } }
+    const entry = {
+      scale,
+      cancel: () => {
+        cancelled = true
+      },
+    }
     paints.set(idx, entry)
     const page = await pdf.getPage(idx + 1)
     if (closed || cancelled) return
@@ -96,7 +117,8 @@ export async function createPdfSession(blob: Blob, title: string): Promise<BookS
       canvases.set(idx, canvas)
     }
     const current = paints.get(idx)
-    if (!current || current.scale !== fontScale) void paint(idx, canvas, fontScale)
+    if (!current || current.scale !== fontScale)
+      void paint(idx, canvas, fontScale)
     return { type: 'pdf', canvas }
   }
 

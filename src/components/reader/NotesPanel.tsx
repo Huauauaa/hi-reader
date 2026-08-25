@@ -13,7 +13,11 @@ type Props = {
 }
 
 function label(a: Annotation): string {
-  return a.body?.trim() || a.anchor?.quote || (a.kind === 'bookmark' ? '书签' : '笔记')
+  return (
+    a.body?.trim() ||
+    a.anchor?.quote ||
+    (a.kind === 'bookmark' ? '书签' : '笔记')
+  )
 }
 
 export function NotesPanel({
@@ -28,7 +32,9 @@ export function NotesPanel({
 }: Props) {
   return (
     <div>
-      <h2 className="mb-4 text-sm font-medium tracking-wide opacity-70">笔记</h2>
+      <h2 className="mb-4 text-sm font-medium tracking-wide opacity-70">
+        笔记
+      </h2>
       {format === 'pdf' ? (
         <div className="mb-4 flex flex-col gap-1">
           {onAddPageNote ? (
@@ -57,10 +63,19 @@ export function NotesPanel({
       ) : (
         <ul className="space-y-1">
           {items.map((a) => (
-            <li key={a.id} className="rounded-lg px-3 py-2 hover:bg-[color-mix(in_srgb,var(--page-ink)_7%,transparent)]">
-              <button type="button" onClick={() => onJump(a)} className="w-full text-left text-sm">
+            <li
+              key={a.id}
+              className="rounded-lg px-3 py-2 hover:bg-[color-mix(in_srgb,var(--page-ink)_7%,transparent)]"
+            >
+              <button
+                type="button"
+                onClick={() => onJump(a)}
+                className="w-full text-left text-sm"
+              >
                 {label(a)}
-                {a.page != null ? <span className="opacity-50"> 第 {a.page + 1} 页</span> : null}
+                {a.page != null ? (
+                  <span className="opacity-50"> 第 {a.page + 1} 页</span>
+                ) : null}
               </button>
               <div className="mt-1 flex gap-2 text-xs opacity-60">
                 <button type="button" onClick={() => onEdit(a.id)}>

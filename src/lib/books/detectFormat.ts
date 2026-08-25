@@ -12,7 +12,10 @@ const MIME: Record<string, BookFormat> = {
   'application/epub+zip': 'epub',
 }
 
-export function detectFormat(filename: string, mime?: string): BookFormat | null {
+export function detectFormat(
+  filename: string,
+  mime?: string,
+): BookFormat | null {
   const ext = filename.split('.').pop()?.toLowerCase()
   if (ext && ext in EXT) return EXT[ext]
   if (mime && mime in MIME) return MIME[mime]

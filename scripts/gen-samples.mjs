@@ -12,7 +12,13 @@ async function writePdf() {
   const pdf = await PDFDocument.create()
   const page = pdf.addPage([595, 842])
   const font = await pdf.embedFont(StandardFonts.Helvetica)
-  page.drawText('Sample PDF', { x: 200, y: 400, size: 28, font, color: rgb(0.1, 0.1, 0.1) })
+  page.drawText('Sample PDF', {
+    x: 200,
+    y: 400,
+    size: 28,
+    font,
+    color: rgb(0.1, 0.1, 0.1),
+  })
   writeFileSync(join(outDir, 'sample.pdf'), await pdf.save())
 }
 
@@ -70,7 +76,10 @@ async function writeEpub() {
   </navMap>
 </ncx>`,
   )
-  writeFileSync(join(outDir, 'sample.epub'), await zip.generateAsync({ type: 'nodebuffer' }))
+  writeFileSync(
+    join(outDir, 'sample.epub'),
+    await zip.generateAsync({ type: 'nodebuffer' }),
+  )
 }
 
 await writePdf()

@@ -60,7 +60,11 @@ beforeEach(async () => {
     'fetch',
     vi.fn(async (url: string) => {
       if (String(url).endsWith('books/sample.txt')) {
-        return { ok: true, blob: async () => new Blob(['hello from sample'], { type: 'text/plain' }) }
+        return {
+          ok: true,
+          blob: async () =>
+            new Blob(['hello from sample'], { type: 'text/plain' }),
+        }
       }
       return { ok: false, status: 404, blob: async () => new Blob([]) }
     }),
@@ -75,7 +79,10 @@ it('opens a sample txt via fetch and filePath', async () => {
   const session = await openSession(sampleTxt)
   expect(session.format).toBe('txt')
   expect(session.title).toBe('示例 TXT')
-  expect(session.getPage(0)).toEqual({ type: 'txt', htmlOrText: 'hello from sample' })
+  expect(session.getPage(0)).toEqual({
+    type: 'txt',
+    htmlOrText: 'hello from sample',
+  })
   session.destroy()
 })
 

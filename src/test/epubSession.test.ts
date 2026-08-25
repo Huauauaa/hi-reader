@@ -33,7 +33,9 @@ const mocks = vi.hoisted(() => {
           id: 'n2',
           href: 'ch2.xhtml',
           label: '第二章',
-          subitems: [{ id: 'n2a', href: 'ch2.xhtml#s', label: '小节', subitems: [] }],
+          subitems: [
+            { id: 'n2a', href: 'ch2.xhtml#s', label: '小节', subitems: [] },
+          ],
         },
       ],
     },
@@ -149,7 +151,9 @@ describe('createEpubSession', () => {
     const cb = vi.fn()
     session.onSelected?.(cb)
     expect(mocks.on).toHaveBeenCalledWith('selected', expect.any(Function))
-    const handler = mocks.on.mock.calls.find((c) => c[0] === 'selected')?.[1] as (
+    const handler = mocks.on.mock.calls.find(
+      (c) => c[0] === 'selected',
+    )?.[1] as (
       cfi: string,
       contents: { range: (c: string) => { toString: () => string } },
     ) => void

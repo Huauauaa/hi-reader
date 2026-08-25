@@ -13,11 +13,11 @@ Open the URL Vite prints (default `http://localhost:5173/hi-reader/`). Sample bo
 
 Other scripts:
 
-| Command | Purpose |
-|---------|---------|
-| `pnpm test` | Run Vitest once |
-| `pnpm build` | Typecheck + production build to `dist/` |
-| `pnpm preview` | Serve the built `dist/` locally |
+| Command        | Purpose                                 |
+| -------------- | --------------------------------------- |
+| `pnpm test`    | Run Vitest once                         |
+| `pnpm build`   | Typecheck + production build to `dist/` |
+| `pnpm preview` | Serve the built `dist/` locally         |
 
 ## GitHub Pages deploy
 
@@ -47,11 +47,11 @@ Then open the preview URL and navigate to `/hi-reader/read/sample-txt`.
 
 ## Supported formats
 
-| Format | Reading | Highlights | Notes |
-|--------|---------|------------|-------|
-| **TXT** | Paginated plain text | Select text → 高亮 / 写笔记 | Page + character offset anchors |
-| **EPUB** | EPUB.js reflow | Select text → 高亮 / 写笔记 | CFI anchors (`chapterId`) |
-| **PDF** | pdf.js canvas pages | Not supported (see below) | Page-level notes and bookmarks only |
+| Format   | Reading              | Highlights                  | Notes                               |
+| -------- | -------------------- | --------------------------- | ----------------------------------- |
+| **TXT**  | Paginated plain text | Select text → 高亮 / 写笔记 | Page + character offset anchors     |
+| **EPUB** | EPUB.js reflow       | Select text → 高亮 / 写笔记 | CFI anchors (`chapterId`)           |
+| **PDF**  | pdf.js canvas pages  | Not supported (see below)   | Page-level notes and bookmarks only |
 
 Progress (page, theme, layout) persists in IndexedDB per book.
 
@@ -70,10 +70,10 @@ Highlights and in-text quotes are not available for PDF in this version.
 
 Bundled samples under `public/books/` are for demo only:
 
-| File | Source |
-|------|--------|
-| `sample.txt` | Excerpt from *论语·学而* (public domain) and the opening of *A Tale of Two Cities* by Charles Dickens ([Project Gutenberg](https://www.gutenberg.org/ebooks/98)) |
-| `sample.pdf` | Generated placeholder (“示例 PDF”) via `scripts/gen-samples.mjs` |
-| `sample.epub` | Generated minimal EPUB (“示例 EPUB”) via `scripts/gen-samples.mjs` |
+| File          | Source                                                                                                                                                           |
+| ------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `sample.txt`  | Excerpt from _论语·学而_ (public domain) and the opening of _A Tale of Two Cities_ by Charles Dickens ([Project Gutenberg](https://www.gutenberg.org/ebooks/98)) |
+| `sample.pdf`  | Generated placeholder (“示例 PDF”) via `scripts/gen-samples.mjs`                                                                                                 |
+| `sample.epub` | Generated minimal EPUB (“示例 EPUB”) via `scripts/gen-samples.mjs`                                                                                               |
 
 Regenerate PDF/EPUB samples: `node scripts/gen-samples.mjs`

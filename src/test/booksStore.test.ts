@@ -37,7 +37,11 @@ it('addLocal uses optional title', async () => {
 })
 
 it('saveCover writes coverUrl onto stored meta', async () => {
-  const meta = await booksStore.addLocal(new File(['x'], 'book.txt', { type: 'text/plain' }))
+  const meta = await booksStore.addLocal(
+    new File(['x'], 'book.txt', { type: 'text/plain' }),
+  )
   await booksStore.saveCover(meta.id, 'data:image/svg+xml,cover')
-  expect((await booksStore.listLocal())[0].coverUrl).toBe('data:image/svg+xml,cover')
+  expect((await booksStore.listLocal())[0].coverUrl).toBe(
+    'data:image/svg+xml,cover',
+  )
 })

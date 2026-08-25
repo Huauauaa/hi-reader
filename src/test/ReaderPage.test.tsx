@@ -54,9 +54,27 @@ vi.mock('../lib/readers/epubSession', () => ({ createEpubSession }))
 vi.mock('../lib/readers/pdfSession', () => ({ createPdfSession }))
 
 const samples: BookMeta[] = [
-  { id: 'sample-txt', title: '示例 TXT', format: 'txt', source: 'sample', filePath: 'books/sample.txt' },
-  { id: 'sample-pdf', title: '示例 PDF', format: 'pdf', source: 'sample', filePath: 'books/sample.pdf' },
-  { id: 'sample-epub', title: '示例 EPUB', format: 'epub', source: 'sample', filePath: 'books/sample.epub' },
+  {
+    id: 'sample-txt',
+    title: '示例 TXT',
+    format: 'txt',
+    source: 'sample',
+    filePath: 'books/sample.txt',
+  },
+  {
+    id: 'sample-pdf',
+    title: '示例 PDF',
+    format: 'pdf',
+    source: 'sample',
+    filePath: 'books/sample.pdf',
+  },
+  {
+    id: 'sample-epub',
+    title: '示例 EPUB',
+    format: 'epub',
+    source: 'sample',
+    filePath: 'books/sample.epub',
+  },
 ]
 
 const TXT = 'A'.repeat(900) + 'SECOND PAGE'
@@ -91,7 +109,10 @@ beforeEach(async () => {
         return { ok: true, json: async () => samples }
       }
       if (u.endsWith('books/sample.txt')) {
-        return { ok: true, blob: async () => new Blob([TXT], { type: 'text/plain' }) }
+        return {
+          ok: true,
+          blob: async () => new Blob([TXT], { type: 'text/plain' }),
+        }
       }
       if (u.endsWith('books/sample.epub')) {
         return { ok: true, blob: async () => new Blob(['epub-bytes']) }
@@ -112,19 +133,25 @@ afterEach(() => {
 describe('ReaderPage', () => {
   it('loads a sample TXT end-to-end', async () => {
     renderRead('sample-txt')
-    expect(await screen.findByRole('heading', { name: '示例 TXT' })).toBeInTheDocument()
+    expect(
+      await screen.findByRole('heading', { name: '示例 TXT' }),
+    ).toBeInTheDocument()
     expect(screen.getByText(/AAA/)).toBeInTheDocument()
   })
 
   it('loads a sample PDF end-to-end', async () => {
     renderRead('sample-pdf')
-    expect(await screen.findByRole('heading', { name: '示例 PDF' })).toBeInTheDocument()
+    expect(
+      await screen.findByRole('heading', { name: '示例 PDF' }),
+    ).toBeInTheDocument()
     expect(document.querySelector('[data-reader-page] canvas')).toBeTruthy()
   })
 
   it('loads a sample EPUB end-to-end', async () => {
     renderRead('sample-epub')
-    expect(await screen.findByRole('heading', { name: '示例 EPUB' })).toBeInTheDocument()
+    expect(
+      await screen.findByRole('heading', { name: '示例 EPUB' }),
+    ).toBeInTheDocument()
     expect(document.querySelector('[data-reader-page]')).toBeTruthy()
   })
 
@@ -146,14 +173,20 @@ describe('ReaderPage', () => {
   it('shows not-found when id is missing from catalog', async () => {
     renderRead('no-such-book')
     expect(await screen.findByRole('status')).toHaveTextContent(/找不到/)
-    expect(screen.getByRole('link', { name: '返回书架' })).toHaveAttribute('href', '/')
+    expect(screen.getByRole('link', { name: '返回书架' })).toHaveAttribute(
+      'href',
+      '/',
+    )
   })
 
   it('toasts and links back to shelf when openSession fails', async () => {
     createEpubSession.mockRejectedValueOnce(new Error('corrupt epub'))
     renderRead('sample-epub')
     expect(await screen.findByRole('status')).toHaveTextContent('corrupt epub')
-    expect(screen.getByRole('link', { name: '返回书架' })).toHaveAttribute('href', '/')
+    expect(screen.getByRole('link', { name: '返回书架' })).toHaveAttribute(
+      'href',
+      '/',
+    )
   })
 
   it('opens a local book when books.json fetch fails', async () => {
@@ -168,7 +201,9 @@ describe('ReaderPage', () => {
       }),
     )
     renderRead(meta.id)
-    expect(await screen.findByRole('heading', { name: 'Local Book' })).toBeInTheDocument()
+    expect(
+      await screen.findByRole('heading', { name: 'Local Book' }),
+    ).toBeInTheDocument()
     expect(warn).toHaveBeenCalled()
     warn.mockRestore()
   })

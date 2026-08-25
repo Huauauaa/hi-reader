@@ -32,7 +32,10 @@ export default defineConfig({
       name: 'spa-404',
       closeBundle() {
         const dist = path.resolve('dist')
-        fs.copyFileSync(path.join(dist, 'index.html'), path.join(dist, '404.html'))
+        fs.copyFileSync(
+          path.join(dist, 'index.html'),
+          path.join(dist, '404.html'),
+        )
       },
     },
   ],

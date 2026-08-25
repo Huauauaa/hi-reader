@@ -116,7 +116,10 @@ export function ReaderShell({ session, bookId, initialTheme = 'dark' }: Props) {
 
   async function editNote(id: string) {
     const cur = notes.find((n) => n.id === id)
-    const body = window.prompt('编辑笔记', cur?.body ?? cur?.anchor?.quote ?? '')
+    const body = window.prompt(
+      '编辑笔记',
+      cur?.body ?? cur?.anchor?.quote ?? '',
+    )
     if (body == null) return
     await annotationsStore.update(id, { body })
     refreshNotes()
@@ -150,10 +153,15 @@ export function ReaderShell({ session, bookId, initialTheme = 'dark' }: Props) {
       : `${page + 1} / ${count}`
 
   return (
-    <div className="reader-root relative flex h-full min-h-full flex-col" data-theme={theme}>
+    <div
+      className="reader-root relative flex h-full min-h-full flex-col"
+      data-theme={theme}
+    >
       <header className="flex shrink-0 items-center gap-3 px-5 py-3">
         <BookOpen size={22} className="shrink-0 opacity-80" />
-        <h1 className="min-w-0 flex-1 truncate text-[15px] font-medium">{session.title}</h1>
+        <h1 className="min-w-0 flex-1 truncate text-[15px] font-medium">
+          {session.title}
+        </h1>
         <nav className="flex shrink-0 items-center gap-2 text-[13px] opacity-55">
           <Link to="/" className="hover:opacity-100">
             首页
@@ -246,7 +254,9 @@ export function ReaderShell({ session, bookId, initialTheme = 'dark' }: Props) {
               }}
             />
           ) : null}
-          {panel === 'theme' ? <ThemePanel theme={theme} onChange={setTheme} /> : null}
+          {panel === 'theme' ? (
+            <ThemePanel theme={theme} onChange={setTheme} />
+          ) : null}
           {panel === 'notes' ? (
             <NotesPanel
               items={notes}
@@ -255,8 +265,12 @@ export function ReaderShell({ session, bookId, initialTheme = 'dark' }: Props) {
               onJump={jumpTo}
               onEdit={(id) => void editNote(id)}
               onDelete={(id) => void deleteNote(id)}
-              onAddPageNote={session.format === 'pdf' ? () => void addPageNote() : undefined}
-              onAddBookmark={session.format === 'pdf' ? () => void addBookmark() : undefined}
+              onAddPageNote={
+                session.format === 'pdf' ? () => void addPageNote() : undefined
+              }
+              onAddBookmark={
+                session.format === 'pdf' ? () => void addBookmark() : undefined
+              }
             />
           ) : null}
         </aside>

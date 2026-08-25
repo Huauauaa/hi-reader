@@ -5,8 +5,20 @@ import { booksStore, clearAllBooksForTests } from '../lib/books/store'
 import type { BookMeta } from '../types/book'
 
 const samples: BookMeta[] = [
-  { id: 'sample-txt', title: '示例 TXT', format: 'txt', source: 'sample', filePath: 'books/sample.txt' },
-  { id: 'sample-pdf', title: '示例 PDF', format: 'pdf', source: 'sample', filePath: 'books/sample.pdf' },
+  {
+    id: 'sample-txt',
+    title: '示例 TXT',
+    format: 'txt',
+    source: 'sample',
+    filePath: 'books/sample.txt',
+  },
+  {
+    id: 'sample-pdf',
+    title: '示例 PDF',
+    format: 'pdf',
+    source: 'sample',
+    filePath: 'books/sample.pdf',
+  },
 ]
 
 beforeEach(async () => {
@@ -57,7 +69,9 @@ it('loadCatalog still returns local books if samples fetch fails', async () => {
     }),
   )
   const catalog = await loadCatalog()
-  expect(catalog).toEqual([expect.objectContaining({ title: 'My Book', source: 'local' })])
+  expect(catalog).toEqual([
+    expect.objectContaining({ title: 'My Book', source: 'local' }),
+  ])
   expect(warn).toHaveBeenCalled()
   warn.mockRestore()
 })
@@ -71,10 +85,28 @@ it('skips broken sample cards and warns', async () => {
         return {
           ok: true,
           json: async () => [
-            { id: 'ok', title: 'Good', format: 'txt', source: 'sample', filePath: 'books/ok.txt' },
-            { id: 'empty-title', title: '', format: 'txt', source: 'sample', filePath: 'books/x.txt' },
+            {
+              id: 'ok',
+              title: 'Good',
+              format: 'txt',
+              source: 'sample',
+              filePath: 'books/ok.txt',
+            },
+            {
+              id: 'empty-title',
+              title: '',
+              format: 'txt',
+              source: 'sample',
+              filePath: 'books/x.txt',
+            },
             { id: 'nopath', title: 'No path', format: 'txt', source: 'sample' },
-            { id: 'bad-fmt', title: 'Doc', format: 'docx', source: 'sample', filePath: 'books/x.docx' },
+            {
+              id: 'bad-fmt',
+              title: 'Doc',
+              format: 'docx',
+              source: 'sample',
+              filePath: 'books/x.docx',
+            },
             { not: 'a book' },
           ],
         }

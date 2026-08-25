@@ -60,10 +60,10 @@ public/
 
 ### Routing
 
-| Path | View |
-|------|------|
-| `/` | Bookshelf |
-| `/read/:id` | Reader |
+| Path        | View      |
+| ----------- | --------- |
+| `/`         | Bookshelf |
+| `/read/:id` | Reader    |
 
 Vite `base` defaults to `/hi-reader/` for project Pages; overridable via env. SPA fallback: copy `index.html` → `404.html` in deploy.
 
@@ -113,14 +113,14 @@ PDF adapter ignores font-size as body typography; may map to zoom. Layout single
 
 ### Right toolbar
 
-| Control | Behavior |
-|---------|----------|
-| 目录 | Side panel: TOC; jump to chapter/page |
-| 字号 | Stepper or presets for TXT/EPUB; PDF zoom optional |
-| 批注 | Toggle highlight mode / apply highlight to selection (TXT/EPUB); PDF shows tip to use 笔记 for page notes |
-| 笔记 | List notes; create from selection (TXT/EPUB) or current page (PDF); edit/delete |
-| 布局 | Toggle single / double column |
-| 主题 | light / sepia / dark |
+| Control | Behavior                                                                                                  |
+| ------- | --------------------------------------------------------------------------------------------------------- |
+| 目录    | Side panel: TOC; jump to chapter/page                                                                     |
+| 字号    | Stepper or presets for TXT/EPUB; PDF zoom optional                                                        |
+| 批注    | Toggle highlight mode / apply highlight to selection (TXT/EPUB); PDF shows tip to use 笔记 for page notes |
+| 笔记    | List notes; create from selection (TXT/EPUB) or current page (PDF); edit/delete                           |
+| 布局    | Toggle single / double column                                                                             |
+| 主题    | light / sepia / dark                                                                                      |
 
 ### Annotations model
 
@@ -133,8 +133,8 @@ type Annotation = {
   anchor?: { start: number; end: number; quote: string; chapterId?: string }
   // PDF / shared page target
   page?: number
-  body?: string        // note text
-  color?: string       // highlight
+  body?: string // note text
+  color?: string // highlight
   createdAt: number
   updatedAt: number
 }
@@ -145,11 +145,11 @@ type Annotation = {
 
 ### Format specifics
 
-| Format | Engine | Pagination | Annotations |
-|--------|--------|------------|-------------|
-| TXT | Custom splitter | Measure columns; page by character/paragraph chunks | Range highlight + notes |
-| EPUB | epub.js (or equivalent maintained lib) | Library pagination / spine | CFI or chapter+offset + quote; notes |
-| PDF | pdf.js | One or two pages | `kind: 'bookmark' \| 'note'` with `page` only |
+| Format | Engine                                 | Pagination                                          | Annotations                                   |
+| ------ | -------------------------------------- | --------------------------------------------------- | --------------------------------------------- |
+| TXT    | Custom splitter                        | Measure columns; page by character/paragraph chunks | Range highlight + notes                       |
+| EPUB   | epub.js (or equivalent maintained lib) | Library pagination / spine                          | CFI or chapter+offset + quote; notes          |
+| PDF    | pdf.js                                 | One or two pages                                    | `kind: 'bookmark' \| 'note'` with `page` only |
 
 ## GitHub Pages
 

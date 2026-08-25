@@ -9,7 +9,9 @@ type Props = {
 export function TocPanel({ items, currentPage, onJump }: Props) {
   return (
     <div>
-      <h2 className="mb-4 text-sm font-medium tracking-wide opacity-70">目录</h2>
+      <h2 className="mb-4 text-sm font-medium tracking-wide opacity-70">
+        目录
+      </h2>
       {items.length === 0 ? (
         <p className="text-sm opacity-50">暂无目录</p>
       ) : (

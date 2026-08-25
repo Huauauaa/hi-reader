@@ -14,7 +14,9 @@ type Props = {
 export function FontPanel({ fontScale, onChange }: Props) {
   return (
     <div>
-      <h2 className="mb-4 text-sm font-medium tracking-wide opacity-70">字号</h2>
+      <h2 className="mb-4 text-sm font-medium tracking-wide opacity-70">
+        字号
+      </h2>
       <div className="flex items-center justify-between gap-4">
         <button
           type="button"
@@ -25,7 +27,9 @@ export function FontPanel({ fontScale, onChange }: Props) {
         >
           A−
         </button>
-        <span className="tabular-nums text-sm opacity-70">{Math.round(fontScale * 100)}%</span>
+        <span className="tabular-nums text-sm opacity-70">
+          {Math.round(fontScale * 100)}%
+        </span>
         <button
           type="button"
           aria-label="增大字号"

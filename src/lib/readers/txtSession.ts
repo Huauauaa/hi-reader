@@ -12,7 +12,9 @@ function charsPerPage(layout: 'single' | 'double', fontScale: number): number {
 export function createTxtSession(text: string, title: string): BookSession {
   let layout: 'single' | 'double' = 'single'
   let fontScale = 1
-  let pages = paginateTxt(text, { charsPerPage: charsPerPage(layout, fontScale) })
+  let pages = paginateTxt(text, {
+    charsPerPage: charsPerPage(layout, fontScale),
+  })
   let currentPage = 0
 
   function repaginate() {

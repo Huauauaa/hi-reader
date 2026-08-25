@@ -38,7 +38,10 @@ function bookGet(spine: SpineItem[], path: string): number {
   )
 }
 
-function flattenToc(items: NavItem[] | undefined, spine: SpineItem[]): TocItem[] {
+function flattenToc(
+  items: NavItem[] | undefined,
+  spine: SpineItem[],
+): TocItem[] {
   const out: TocItem[] = []
   function walk(list: NavItem[]) {
     for (const item of list) {
@@ -57,7 +60,11 @@ function flattenToc(items: NavItem[] | undefined, spine: SpineItem[]): TocItem[]
   return out
 }
 
-function applyChrome(rendition: Rendition, host: HTMLElement | null, fontScale: number) {
+function applyChrome(
+  rendition: Rendition,
+  host: HTMLElement | null,
+  fontScale: number,
+) {
   const root = host?.closest('.reader-root') as HTMLElement | null
   const style = root ? getComputedStyle(root) : null
   const bg = style?.getPropertyValue('--page-bg').trim() || '#2a2a2a'
@@ -74,7 +81,10 @@ function applyChrome(rendition: Rendition, host: HTMLElement | null, fontScale: 
   }
 }
 
-export async function createEpubSession(blob: Blob, title: string): Promise<BookSession> {
+export async function createEpubSession(
+  blob: Blob,
+  title: string,
+): Promise<BookSession> {
   const book = openBook(await blob.arrayBuffer())
   await book.ready
 
@@ -93,15 +103,18 @@ export async function createEpubSession(blob: Blob, title: string): Promise<Book
   let skipHrefDisplay = false
 
   function bindSelected(r: Rendition) {
-    r.on('selected', (cfi: string, contents: { range: (c: string) => Range }) => {
-      let quote = ''
-      try {
-        quote = contents.range(cfi)?.toString() ?? ''
-      } catch {
-        quote = ''
-      }
-      selectedCb?.({ cfi, quote: quote || cfi })
-    })
+    r.on(
+      'selected',
+      (cfi: string, contents: { range: (c: string) => Range }) => {
+        let quote = ''
+        try {
+          quote = contents.range(cfi)?.toString() ?? ''
+        } catch {
+          quote = ''
+        }
+        selectedCb?.({ cfi, quote: quote || cfi })
+      },
+    )
   }
 
   function hrefFor(page: number): string {
@@ -233,7 +246,9 @@ export async function createEpubSession(blob: Blob, title: string): Promise<Book
     displayCfi(cfi: string): void {
       const item = book.spine.get(cfi) as SpineItem | undefined
       if (item) {
-        const idx = spine.findIndex((s) => s.href === item.href || s.index === item.index)
+        const idx = spine.findIndex(
+          (s) => s.href === item.href || s.index === item.index,
+        )
         if (idx >= 0) {
           if (rendition && idx !== currentPage) skipHrefDisplay = true
           currentPage = idx

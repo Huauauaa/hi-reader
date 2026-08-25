@@ -29,7 +29,11 @@ export const booksStore = {
       source: 'local',
     }
     const blob = await blobToArrayBuffer(file)
-    await idb.putBook({ meta, blob, contentType: file.type || 'application/octet-stream' })
+    await idb.putBook({
+      meta,
+      blob,
+      contentType: file.type || 'application/octet-stream',
+    })
     return meta
   },
 

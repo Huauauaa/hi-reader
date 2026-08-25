@@ -16,7 +16,14 @@ type Props = {
 
 type Pop = { cfi: string; quote: string }
 
-export function EpubView({ session, layout, theme, bookId, annotations, onChanged }: Props) {
+export function EpubView({
+  session,
+  layout,
+  theme,
+  bookId,
+  annotations,
+  onChanged,
+}: Props) {
   const ref = useRef<HTMLDivElement>(null)
   const [pop, setPop] = useState<Pop | null>(null)
   const page = session.getCurrentPage()
@@ -46,7 +53,8 @@ export function EpubView({ session, layout, theme, bookId, annotations, onChange
 
   async function save(kind: 'highlight' | 'note') {
     if (!pop) return
-    const body = kind === 'note' ? window.prompt('写笔记', pop.quote) : undefined
+    const body =
+      kind === 'note' ? window.prompt('写笔记', pop.quote) : undefined
     if (kind === 'note' && body == null) return
     await annotationsStore.add({
       bookId,
@@ -55,7 +63,12 @@ export function EpubView({ session, layout, theme, bookId, annotations, onChange
       color: kind === 'highlight' ? HL : undefined,
       page,
       // ponytail: CFI in chapterId; start/end unused for epub
-      anchor: { start: 0, end: 0, quote: pop.quote || pop.cfi, chapterId: pop.cfi },
+      anchor: {
+        start: 0,
+        end: 0,
+        quote: pop.quote || pop.cfi,
+        chapterId: pop.cfi,
+      },
     })
     setPop(null)
     onChanged()
@@ -73,10 +86,18 @@ export function EpubView({ session, layout, theme, bookId, annotations, onChange
           data-annot-pop
           className="absolute left-1/2 top-3 z-40 flex -translate-x-1/2 gap-1 rounded-lg bg-neutral-800 p-1 text-sm text-white shadow-lg"
         >
-          <button type="button" className="rounded px-2 py-1 hover:bg-white/10" onClick={() => void save('highlight')}>
+          <button
+            type="button"
+            className="rounded px-2 py-1 hover:bg-white/10"
+            onClick={() => void save('highlight')}
+          >
             高亮
           </button>
-          <button type="button" className="rounded px-2 py-1 hover:bg-white/10" onClick={() => void save('note')}>
+          <button
+            type="button"
+            className="rounded px-2 py-1 hover:bg-white/10"
+            onClick={() => void save('note')}
+          >
             写笔记
           </button>
         </div>

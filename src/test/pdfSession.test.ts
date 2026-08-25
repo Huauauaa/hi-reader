@@ -31,7 +31,10 @@ const mocks = vi.hoisted(() => {
     destroy: destroyPdf,
   }
   const GlobalWorkerOptions = { workerSrc: '' }
-  const getDocument = vi.fn(() => ({ promise: Promise.resolve(pdf), destroy: destroyPdf }))
+  const getDocument = vi.fn(() => ({
+    promise: Promise.resolve(pdf),
+    destroy: destroyPdf,
+  }))
   return {
     GlobalWorkerOptions,
     getDocument,
@@ -128,7 +131,9 @@ describe('createPdfSession', () => {
     expect(mocks.getViewport).toHaveBeenCalledWith({ scale: 1 })
     session.setFontScale(1.5)
     session.getPage(0)
-    await vi.waitFor(() => expect(mocks.getViewport).toHaveBeenCalledWith({ scale: 1.5 }))
+    await vi.waitFor(() =>
+      expect(mocks.getViewport).toHaveBeenCalledWith({ scale: 1.5 }),
+    )
     session.destroy()
   })
 

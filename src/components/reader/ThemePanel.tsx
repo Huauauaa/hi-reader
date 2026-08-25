@@ -16,7 +16,9 @@ type Props = {
 export function ThemePanel({ theme, onChange }: Props) {
   return (
     <div>
-      <h2 className="mb-4 text-sm font-medium tracking-wide opacity-70">主题</h2>
+      <h2 className="mb-4 text-sm font-medium tracking-wide opacity-70">
+        主题
+      </h2>
       <div className="flex flex-col gap-2">
         {THEMES.map((t) => (
           <button

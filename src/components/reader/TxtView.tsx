@@ -27,7 +27,13 @@ function textOffset(root: Node, target: Node, offset: number): number {
   return pre.toString().length
 }
 
-export function TxtView({ session, layout, bookId, annotations, onChanged }: Props) {
+export function TxtView({
+  session,
+  layout,
+  bookId,
+  annotations,
+  onChanged,
+}: Props) {
   const [pop, setPop] = useState<Pop | null>(null)
   const page = session.getCurrentPage()
   const count = session.getPageCount()
@@ -38,11 +44,16 @@ export function TxtView({ session, layout, bookId, annotations, onChanged }: Pro
   const fontSize = `${1.05 * scale}rem`
   const marks = annotations
     .filter((a) => a.kind === 'highlight' && a.anchor)
-    .map((a) => ({ start: a.anchor!.start, end: a.anchor!.end, color: a.color ?? HL }))
+    .map((a) => ({
+      start: a.anchor!.start,
+      end: a.anchor!.end,
+      color: a.color ?? HL,
+    }))
 
   async function save(kind: 'highlight' | 'note') {
     if (!pop) return
-    const body = kind === 'note' ? window.prompt('写笔记', pop.quote) : undefined
+    const body =
+      kind === 'note' ? window.prompt('写笔记', pop.quote) : undefined
     if (kind === 'note' && body == null) return
     await annotationsStore.add({
       bookId,
@@ -84,10 +95,20 @@ export function TxtView({ session, layout, bookId, annotations, onChanged }: Pro
           className="fixed z-40 flex -translate-x-1/2 gap-1 rounded-lg bg-neutral-800 p-1 text-sm text-white shadow-lg"
           style={{ left: pop.x, top: Math.max(8, pop.y - 40) }}
         >
-          <button type="button" className="rounded px-2 py-1 hover:bg-white/10" onMouseDown={(e) => e.preventDefault()} onClick={() => void save('highlight')}>
+          <button
+            type="button"
+            className="rounded px-2 py-1 hover:bg-white/10"
+            onMouseDown={(e) => e.preventDefault()}
+            onClick={() => void save('highlight')}
+          >
             高亮
           </button>
-          <button type="button" className="rounded px-2 py-1 hover:bg-white/10" onMouseDown={(e) => e.preventDefault()} onClick={() => void save('note')}>
+          <button
+            type="button"
+            className="rounded px-2 py-1 hover:bg-white/10"
+            onMouseDown={(e) => e.preventDefault()}
+            onClick={() => void save('note')}
+          >
             写笔记
           </button>
         </div>
@@ -137,7 +158,13 @@ function PageColumn({
       typeof range.getBoundingClientRect === 'function'
         ? range.getBoundingClientRect()
         : { left: 0, top: 0, width: 0, height: 0 }
-    onSelect({ x: rect.left + rect.width / 2, y: rect.top, start: from, end: to, quote })
+    onSelect({
+      x: rect.left + rect.width / 2,
+      y: rect.top,
+      start: from,
+      end: to,
+      quote,
+    })
   }
 
   return (

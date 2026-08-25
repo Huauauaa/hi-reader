@@ -62,7 +62,10 @@ export function ReaderPage() {
 
   if (loading) {
     return (
-      <div className="reader-root flex h-full items-center justify-center text-sm opacity-60" data-theme="dark">
+      <div
+        className="reader-root flex h-full items-center justify-center text-sm opacity-60"
+        data-theme="dark"
+      >
         加载中…
       </div>
     )
@@ -70,7 +73,10 @@ export function ReaderPage() {
 
   if (error || !session) {
     return (
-      <div className="reader-root flex h-full flex-col items-center justify-center gap-4" data-theme="dark">
+      <div
+        className="reader-root flex h-full flex-col items-center justify-center gap-4"
+        data-theme="dark"
+      >
         <p>{error ?? '打开失败'}</p>
         <Link to="/" className="text-sm opacity-70 hover:opacity-100">
           返回书架
@@ -80,5 +86,11 @@ export function ReaderPage() {
     )
   }
 
-  return <ReaderShell session={session} bookId={id ?? session.title} initialTheme={theme} />
+  return (
+    <ReaderShell
+      session={session}
+      bookId={id ?? session.title}
+      initialTheme={theme}
+    />
+  )
 }

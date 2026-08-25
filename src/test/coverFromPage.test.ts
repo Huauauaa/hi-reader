@@ -15,12 +15,21 @@ const pdfMocks = vi.hoisted(() => {
     promise: Promise.resolve({ getPage, numPages: 3 }),
     destroy,
   }))
-  return { GlobalWorkerOptions: { workerSrc: '' }, getDocument, getPage, getViewport, render, destroy }
+  return {
+    GlobalWorkerOptions: { workerSrc: '' },
+    getDocument,
+    getPage,
+    getViewport,
+    render,
+    destroy,
+  }
 })
 
 const epubMocks = vi.hoisted(() => {
   const coverUrl = vi.fn(async () => undefined as string | undefined)
-  const load = vi.fn(async () => ({ documentElement: { textContent: '第一章 无人生还' } }))
+  const load = vi.fn(async () => ({
+    documentElement: { textContent: '第一章 无人生还' },
+  }))
   const destroy = vi.fn()
   const ePub = vi.fn(() => ({
     ready: Promise.resolve(),
@@ -43,27 +52,44 @@ beforeEach(async () => {
   await clearAllBooksForTests()
   vi.clearAllMocks()
   epubMocks.coverUrl.mockResolvedValue(undefined)
-  epubMocks.load.mockResolvedValue({ documentElement: { textContent: '第一章 无人生还' } })
-  vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue({} as CanvasRenderingContext2D)
-  vi.spyOn(HTMLCanvasElement.prototype, 'toDataURL').mockReturnValue('data:image/jpeg;base64,QQ==')
+  epubMocks.load.mockResolvedValue({
+    documentElement: { textContent: '第一章 无人生还' },
+  })
+  vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue(
+    {} as CanvasRenderingContext2D,
+  )
+  vi.spyOn(HTMLCanvasElement.prototype, 'toDataURL').mockReturnValue(
+    'data:image/jpeg;base64,QQ==',
+  )
 })
 
 describe('coverFromFirstPage', () => {
   it('renders txt first page as an svg data url', async () => {
     const { coverFromFirstPage } = await import('../lib/books/coverFromPage')
-    const url = await coverFromFirstPage('txt', new Blob(['论语·学而 子曰：学而时习之'], { type: 'text/plain' }))
+    const url = await coverFromFirstPage(
+      'txt',
+      new Blob(['论语·学而 子曰：学而时习之'], { type: 'text/plain' }),
+    )
     expect(url).toMatch(/^data:image\/svg\+xml/)
     expect(decodeURIComponent(url!)).toContain('论语')
   })
 
   it('returns undefined for empty txt', async () => {
     const { coverFromFirstPage } = await import('../lib/books/coverFromPage')
-    expect(await coverFromFirstPage('txt', new Blob(['   '], { type: 'text/plain' }))).toBeUndefined()
+    expect(
+      await coverFromFirstPage(
+        'txt',
+        new Blob(['   '], { type: 'text/plain' }),
+      ),
+    ).toBeUndefined()
   })
 
   it('renders pdf page 1 to a jpeg data url', async () => {
     const { coverFromFirstPage } = await import('../lib/books/coverFromPage')
-    const url = await coverFromFirstPage('pdf', new Blob(['%PDF'], { type: 'application/pdf' }))
+    const url = await coverFromFirstPage(
+      'pdf',
+      new Blob(['%PDF'], { type: 'application/pdf' }),
+    )
     expect(pdfMocks.getPage).toHaveBeenCalledWith(1)
     expect(url).toBe('data:image/jpeg;base64,QQ==')
     expect(pdfMocks.destroy).toHaveBeenCalled()
@@ -80,14 +106,20 @@ describe('coverFromFirstPage', () => {
       }),
     )
     const { coverFromFirstPage } = await import('../lib/books/coverFromPage')
-    const url = await coverFromFirstPage('epub', new Blob(['PK'], { type: 'application/epub+zip' }))
+    const url = await coverFromFirstPage(
+      'epub',
+      new Blob(['PK'], { type: 'application/epub+zip' }),
+    )
     expect(url).toMatch(/^data:image\/png/)
     vi.unstubAllGlobals()
   })
 
   it('falls back to first epub chapter text when there is no cover image', async () => {
     const { coverFromFirstPage } = await import('../lib/books/coverFromPage')
-    const url = await coverFromFirstPage('epub', new Blob(['PK'], { type: 'application/epub+zip' }))
+    const url = await coverFromFirstPage(
+      'epub',
+      new Blob(['PK'], { type: 'application/epub+zip' }),
+    )
     expect(url).toMatch(/^data:image\/svg\+xml/)
     expect(decodeURIComponent(url!)).toContain('无人生还')
   })
@@ -95,12 +127,16 @@ describe('coverFromFirstPage', () => {
 
 describe('fillMissingCovers', () => {
   it('generates and persists covers for local books without coverUrl', async () => {
-    const meta = await booksStore.addLocal(new File(['学而时习之'], 'analects.txt', { type: 'text/plain' }))
+    const meta = await booksStore.addLocal(
+      new File(['学而时习之'], 'analects.txt', { type: 'text/plain' }),
+    )
     expect(meta.coverUrl).toBeUndefined()
     const { fillMissingCovers } = await import('../lib/books/coverFromPage')
     const filled = await fillMissingCovers([meta])
     expect(filled[0].coverUrl).toMatch(/^data:image\/svg\+xml/)
-    expect((await booksStore.listLocal())[0].coverUrl).toMatch(/^data:image\/svg\+xml/)
+    expect((await booksStore.listLocal())[0].coverUrl).toMatch(
+      /^data:image\/svg\+xml/,
+    )
   })
 
   it('leaves existing coverUrl untouched', async () => {

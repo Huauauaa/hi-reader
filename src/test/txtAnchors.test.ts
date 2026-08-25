@@ -1,5 +1,9 @@
 import { it, expect } from 'vitest'
-import { pageForOffset, pageStart, segmentsForPage } from '../lib/annotations/txtAnchors'
+import {
+  pageForOffset,
+  pageStart,
+  segmentsForPage,
+} from '../lib/annotations/txtAnchors'
 import { createTxtSession } from '../lib/readers/txtSession'
 
 it('maps page-local offsets to global text and back', () => {
@@ -12,7 +16,14 @@ it('maps page-local offsets to global text and back', () => {
 })
 
 it('wraps overlapping page text into mark segments', () => {
-  const segs = segmentsForPage('abcdefgh', 10, [{ start: 12, end: 16, color: '#f7e08a' }])
+  const segs = segmentsForPage('abcdefgh', 10, [
+    { start: 12, end: 16, color: '#f7e08a' },
+  ])
   expect(segs.map((s) => s.text).join('')).toBe('abcdefgh')
-  expect(segs.filter((s) => s.color).map((s) => s.text).join('')).toBe('cdef')
+  expect(
+    segs
+      .filter((s) => s.color)
+      .map((s) => s.text)
+      .join(''),
+  ).toBe('cdef')
 })

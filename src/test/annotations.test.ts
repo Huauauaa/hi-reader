@@ -1,6 +1,9 @@
 import 'fake-indexeddb/auto'
 import { it, expect, beforeEach } from 'vitest'
-import { annotationsStore, clearAllAnnotationsForTests } from '../lib/annotations/store'
+import {
+  annotationsStore,
+  clearAllAnnotationsForTests,
+} from '../lib/annotations/store'
 
 beforeEach(async () => {
   await clearAllAnnotationsForTests()
@@ -29,7 +32,11 @@ it('defaults highlight color to #f7e08a', async () => {
 })
 
 it('lists only the requested book and update patches body', async () => {
-  const a = await annotationsStore.add({ bookId: 'one', kind: 'note', body: 'x' })
+  const a = await annotationsStore.add({
+    bookId: 'one',
+    kind: 'note',
+    body: 'x',
+  })
   await annotationsStore.add({ bookId: 'two', kind: 'note', body: 'y' })
   expect(await annotationsStore.list('one')).toHaveLength(1)
   const updated = await annotationsStore.update(a.id, { body: 'z' })

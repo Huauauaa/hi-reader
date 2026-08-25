@@ -13,14 +13,20 @@ export function BookCard({ book }: Props) {
     >
       <div className="aspect-[3/4] overflow-hidden rounded-sm bg-neutral-200 shadow-sm">
         {book.coverUrl ? (
-          <img src={book.coverUrl} alt="" className="h-full w-full object-cover" />
+          <img
+            src={book.coverUrl}
+            alt=""
+            className="h-full w-full object-cover"
+          />
         ) : (
           <div className="flex h-full w-full items-center justify-center bg-neutral-100 text-3xl font-medium text-neutral-400">
             {initial}
           </div>
         )}
       </div>
-      <p className="mt-2 truncate text-sm text-[var(--shelf-ink)]">{book.title}</p>
+      <p className="mt-2 truncate text-sm text-[var(--shelf-ink)]">
+        {book.title}
+      </p>
     </Link>
   )
 }

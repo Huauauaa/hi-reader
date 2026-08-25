@@ -53,14 +53,18 @@ function tx<T>(
 }
 
 export const idb = {
-  getBook: (id: string) => tx<BookRecord | undefined>('books', 'readonly', (s) => s.get(id)),
-  putBook: (record: BookRecord) => tx<IDBValidKey>('books', 'readwrite', (s) => s.put(record)),
-  deleteBook: (id: string) => tx<undefined>('books', 'readwrite', (s) => s.delete(id)),
-  listBooks: () =>
-    tx<BookRecord[]>('books', 'readonly', (s) => s.getAll()),
+  getBook: (id: string) =>
+    tx<BookRecord | undefined>('books', 'readonly', (s) => s.get(id)),
+  putBook: (record: BookRecord) =>
+    tx<IDBValidKey>('books', 'readwrite', (s) => s.put(record)),
+  deleteBook: (id: string) =>
+    tx<undefined>('books', 'readwrite', (s) => s.delete(id)),
+  listBooks: () => tx<BookRecord[]>('books', 'readonly', (s) => s.getAll()),
   clearBooks: () => tx<undefined>('books', 'readwrite', (s) => s.clear()),
   getProgress: (bookId: string) =>
-    tx<ReadingProgress | undefined>('progress', 'readonly', (s) => s.get(bookId)),
+    tx<ReadingProgress | undefined>('progress', 'readonly', (s) =>
+      s.get(bookId),
+    ),
   putProgress: (p: ReadingProgress) =>
     tx<IDBValidKey>('progress', 'readwrite', (s) => s.put(p)),
   clearProgress: () => tx<undefined>('progress', 'readwrite', (s) => s.clear()),
@@ -71,6 +75,8 @@ export const idb = {
   deleteAnnotation: (id: string) =>
     tx<undefined>('annotations', 'readwrite', (s) => s.delete(id)),
   // ponytail: scan-all; add bookId index if a library grows
-  listAnnotations: () => tx<Annotation[]>('annotations', 'readonly', (s) => s.getAll()),
-  clearAnnotations: () => tx<undefined>('annotations', 'readwrite', (s) => s.clear()),
+  listAnnotations: () =>
+    tx<Annotation[]>('annotations', 'readonly', (s) => s.getAll()),
+  clearAnnotations: () =>
+    tx<undefined>('annotations', 'readwrite', (s) => s.clear()),
 }

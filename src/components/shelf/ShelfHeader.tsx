@@ -9,7 +9,9 @@ type Props = {
 export function ShelfHeader({ query, onQueryChange, children }: Props) {
   return (
     <header className="sticky top-0 z-10 flex items-center gap-4 border-b border-neutral-100 bg-[var(--shelf-bg)] px-6 py-4">
-      <span className="shrink-0 text-lg font-semibold tracking-tight">hi-reader</span>
+      <span className="shrink-0 text-lg font-semibold tracking-tight">
+        hi-reader
+      </span>
       <div className="flex flex-1 justify-center">
         <input
           type="search"

@@ -18,7 +18,10 @@ it('createTxtSession exposes toc, pages, and navigation', () => {
   expect(session.title).toBe('Test Book')
   expect(session.getToc()).toEqual([{ id: 'body', label: '正文', page: 0 }])
   expect(session.getPageCount()).toBeGreaterThan(0)
-  expect(session.getPage(0)).toEqual({ type: 'txt', htmlOrText: expect.any(String) })
+  expect(session.getPage(0)).toEqual({
+    type: 'txt',
+    htmlOrText: expect.any(String),
+  })
   session.goToPage(1)
   expect(session.getCurrentPage()).toBe(1)
   session.next()

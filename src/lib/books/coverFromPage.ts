@@ -76,7 +76,9 @@ async function epubCover(blob: Blob): Promise<string | undefined> {
     }
     const href = book.spine.get(0)?.href
     if (!href) return undefined
-    const doc = (await book.load(href)) as { documentElement?: { textContent?: string | null } }
+    const doc = (await book.load(href)) as {
+      documentElement?: { textContent?: string | null }
+    }
     return txtCover(doc.documentElement?.textContent ?? '')
   } finally {
     book.destroy()
@@ -96,12 +98,17 @@ export async function coverFromFirstPage(
   }
 }
 
-export async function fillMissingCovers(books: BookMeta[]): Promise<BookMeta[]> {
+export async function fillMissingCovers(
+  books: BookMeta[],
+): Promise<BookMeta[]> {
   const out = books.map((b) => ({ ...b }))
   for (const book of out) {
     if (book.coverUrl) continue
     try {
-      const coverUrl = await coverFromFirstPage(book.format, await loadBlob(book))
+      const coverUrl = await coverFromFirstPage(
+        book.format,
+        await loadBlob(book),
+      )
       if (!coverUrl) continue
       book.coverUrl = coverUrl
       if (book.source === 'local') await booksStore.saveCover(book.id, coverUrl)

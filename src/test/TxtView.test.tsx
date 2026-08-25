@@ -1,7 +1,16 @@
-import { render, screen, fireEvent, cleanup, waitFor } from '@testing-library/react'
+import {
+  render,
+  screen,
+  fireEvent,
+  cleanup,
+  waitFor,
+} from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { TxtView } from '../components/reader/TxtView'
-import { annotationsStore, clearAllAnnotationsForTests } from '../lib/annotations/store'
+import {
+  annotationsStore,
+  clearAllAnnotationsForTests,
+} from '../lib/annotations/store'
 import { createTxtSession } from '../lib/readers/txtSession'
 
 afterEach(() => {
@@ -18,7 +27,13 @@ describe('TxtView', () => {
     const session = createTxtSession('hello world', 't')
     const onChanged = vi.fn()
     render(
-      <TxtView session={session} layout="single" bookId="txt-1" annotations={[]} onChanged={onChanged} />,
+      <TxtView
+        session={session}
+        layout="single"
+        bookId="txt-1"
+        annotations={[]}
+        onChanged={onChanged}
+      />,
     )
     const p = document.querySelector('[data-reader-page] p')!
     const range = document.createRange()

@@ -19,7 +19,9 @@ export function PdfView({ session, layout }: Props) {
       }`}
     >
       <PageColumn canvas={left.type === 'pdf' ? left.canvas : null} />
-      {right && right.type === 'pdf' ? <PageColumn canvas={right.canvas} /> : null}
+      {right && right.type === 'pdf' ? (
+        <PageColumn canvas={right.canvas} />
+      ) : null}
     </div>
   )
 }

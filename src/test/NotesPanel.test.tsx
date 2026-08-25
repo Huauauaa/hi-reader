@@ -25,7 +25,13 @@ describe('NotesPanel', () => {
     const onJump = vi.fn()
     render(
       <NotesPanel
-        items={[note({ kind: 'highlight', body: undefined, anchor: { start: 0, end: 4, quote: 'abcd' } })]}
+        items={[
+          note({
+            kind: 'highlight',
+            body: undefined,
+            anchor: { start: 0, end: 4, quote: 'abcd' },
+          }),
+        ]}
         format="txt"
         currentPage={0}
         onJump={onJump}
@@ -50,7 +56,9 @@ describe('NotesPanel', () => {
         onAddPageNote={onAddPageNote}
       />,
     )
-    expect(screen.getByRole('button', { name: /hello.*第 3 页/ })).toBeInTheDocument()
+    expect(
+      screen.getByRole('button', { name: /hello.*第 3 页/ }),
+    ).toBeInTheDocument()
     fireEvent.click(screen.getByRole('button', { name: '为本页添加笔记' }))
     expect(onAddPageNote).toHaveBeenCalledOnce()
   })

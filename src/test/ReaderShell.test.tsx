@@ -1,4 +1,10 @@
-import { render, screen, fireEvent, waitFor, cleanup } from '@testing-library/react'
+import {
+  render,
+  screen,
+  fireEvent,
+  waitFor,
+  cleanup,
+} from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { ReaderShell } from '../components/reader/ReaderShell'
@@ -42,9 +48,17 @@ describe('ReaderShell', () => {
   it('renders title, header links, and first page text', () => {
     const session = createTxtSession(longBook(), 'Test Book')
     renderShell(session)
-    expect(screen.getByRole('heading', { name: 'Test Book' })).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: '首页' })).toHaveAttribute('href', '/')
-    expect(screen.getByRole('link', { name: '我的书架' })).toHaveAttribute('href', '/')
+    expect(
+      screen.getByRole('heading', { name: 'Test Book' }),
+    ).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: '首页' })).toHaveAttribute(
+      'href',
+      '/',
+    )
+    expect(screen.getByRole('link', { name: '我的书架' })).toHaveAttribute(
+      'href',
+      '/',
+    )
     expect(screen.getByText(/AAA/)).toBeInTheDocument()
     expect(screen.queryByText(/BBB/)).not.toBeInTheDocument()
   })
@@ -72,7 +86,9 @@ describe('ReaderShell', () => {
     fireEvent.click(screen.getByRole('button', { name: '目录' }))
     expect(screen.getByRole('button', { name: '正文' })).toBeInTheDocument()
     fireEvent.keyDown(window, { key: 'Escape' })
-    expect(screen.queryByRole('button', { name: '正文' })).not.toBeInTheDocument()
+    expect(
+      screen.queryByRole('button', { name: '正文' }),
+    ).not.toBeInTheDocument()
   })
 
   it('applies theme CSS variables on .reader-root', () => {
@@ -126,7 +142,9 @@ describe('ReaderShell', () => {
     vi.spyOn(window, 'prompt').mockReturnValue('页备注')
     renderShell(session, 'pdf-1')
     fireEvent.click(screen.getByRole('button', { name: '批注' }))
-    expect(screen.getByRole('status')).toHaveTextContent('PDF 请使用笔记添加页备注')
+    expect(screen.getByRole('status')).toHaveTextContent(
+      'PDF 请使用笔记添加页备注',
+    )
     fireEvent.click(screen.getByRole('button', { name: '笔记' }))
     fireEvent.click(screen.getByRole('button', { name: '为本页添加笔记' }))
     await waitFor(() => {
@@ -184,7 +202,9 @@ describe('ReaderShell', () => {
       destroy: () => {},
     }
     renderShell(session)
-    expect(screen.getByRole('heading', { name: '示例 PDF' })).toBeInTheDocument()
+    expect(
+      screen.getByRole('heading', { name: '示例 PDF' }),
+    ).toBeInTheDocument()
     expect(document.querySelector('[data-reader-page] canvas')).toBe(canvas)
   })
 
@@ -195,7 +215,10 @@ describe('ReaderShell', () => {
       title: '示例 EPUB',
       getToc: () => [{ id: 'n1', label: '第一章', page: 0 }],
       getPageCount: () => 2,
-      getPage: () => ({ type: 'epub', container: document.createElement('div') }),
+      getPage: () => ({
+        type: 'epub',
+        container: document.createElement('div'),
+      }),
       goToPage: () => {},
       next: () => {},
       prev: () => {},
@@ -209,7 +232,9 @@ describe('ReaderShell', () => {
       display: vi.fn(),
     }
     renderShell(session)
-    expect(screen.getByRole('heading', { name: '示例 EPUB' })).toBeInTheDocument()
+    expect(
+      screen.getByRole('heading', { name: '示例 EPUB' }),
+    ).toBeInTheDocument()
     expect(attach).toHaveBeenCalled()
     expect(document.querySelector('[data-reader-page]')).toBeTruthy()
   })
