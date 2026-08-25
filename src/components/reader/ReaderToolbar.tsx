@@ -1,13 +1,13 @@
 import { Columns, Highlighter, List, Note, Palette, TextAa } from '@phosphor-icons/react'
 
-export type ReaderPanel = 'toc' | 'font' | 'theme'
+export type ReaderPanel = 'toc' | 'font' | 'theme' | 'notes'
 
 type Props = {
   active: ReaderPanel | null
   layout: 'single' | 'double'
   onToggle: (panel: ReaderPanel) => void
   onLayoutToggle: () => void
-  onSoon: () => void
+  onAnnotate: () => void
 }
 
 const btn =
@@ -17,7 +17,7 @@ function activeCls(on: boolean): string {
   return on ? 'bg-[color-mix(in_srgb,var(--page-ink)_18%,transparent)]' : 'bg-[color-mix(in_srgb,var(--page-ink)_8%,transparent)]'
 }
 
-export function ReaderToolbar({ active, layout, onToggle, onLayoutToggle, onSoon }: Props) {
+export function ReaderToolbar({ active, layout, onToggle, onLayoutToggle, onAnnotate }: Props) {
   return (
     <div className="absolute right-3 top-1/2 z-30 flex -translate-y-1/2 flex-col gap-2.5 md:right-5">
       <button type="button" aria-label="目录" aria-pressed={active === 'toc'} className={`${btn} ${activeCls(active === 'toc')}`} onClick={() => onToggle('toc')}>
@@ -26,10 +26,10 @@ export function ReaderToolbar({ active, layout, onToggle, onLayoutToggle, onSoon
       <button type="button" aria-label="字号" aria-pressed={active === 'font'} className={`${btn} ${activeCls(active === 'font')}`} onClick={() => onToggle('font')}>
         <TextAa size={20} />
       </button>
-      <button type="button" aria-label="批注" className={`${btn} ${activeCls(false)}`} onClick={onSoon}>
+      <button type="button" aria-label="批注" className={`${btn} ${activeCls(false)}`} onClick={onAnnotate}>
         <Highlighter size={20} />
       </button>
-      <button type="button" aria-label="笔记" className={`${btn} ${activeCls(false)}`} onClick={onSoon}>
+      <button type="button" aria-label="笔记" aria-pressed={active === 'notes'} className={`${btn} ${activeCls(active === 'notes')}`} onClick={() => onToggle('notes')}>
         <Note size={20} />
       </button>
       <button

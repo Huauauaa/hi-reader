@@ -8,11 +8,17 @@ const mocks = vi.hoisted(() => {
   const override = vi.fn()
   const destroyRendition = vi.fn()
   const destroyBook = vi.fn()
+  const on = vi.fn()
+  const highlight = vi.fn()
+  const remove = vi.fn()
   const renderTo = vi.fn(() => ({
     display,
     spread,
     themes: { fontSize, override, default: vi.fn() },
     destroy: destroyRendition,
+    on,
+    off: vi.fn(),
+    annotations: { highlight, remove },
   }))
   const ch1 = { href: 'ch1.xhtml', linear: true, index: 0 }
   const ch2 = { href: 'ch2.xhtml', linear: true, index: 1 }
@@ -51,6 +57,9 @@ const mocks = vi.hoisted(() => {
     destroyRendition,
     destroyBook,
     renderTo,
+    on,
+    highlight,
+    remove,
   }
 })
 
@@ -130,5 +139,24 @@ describe('createEpubSession', () => {
     session.destroy()
     expect(mocks.destroyRendition).toHaveBeenCalled()
     expect(mocks.destroyBook).toHaveBeenCalled()
+  })
+
+  it('forwards selected CFI and applies highlights', async () => {
+    const session = await createEpubSession(new Blob(['x']), 'Book')
+    session.attach?.(document.createElement('div'))
+    const cb = vi.fn()
+    session.onSelected?.(cb)
+    expect(mocks.on).toHaveBeenCalledWith('selected', expect.any(Function))
+    const handler = mocks.on.mock.calls.find((c) => c[0] === 'selected')?.[1] as (
+      cfi: string,
+      contents: { range: (c: string) => { toString: () => string } },
+    ) => void
+    handler('epubcfi(x)', { range: () => ({ toString: () => 'hi' }) })
+    expect(cb).toHaveBeenCalledWith({ cfi: 'epubcfi(x)', quote: 'hi' })
+    session.applyHighlights?.([{ cfi: 'epubcfi(x)', color: '#f7e08a' }])
+    expect(mocks.highlight).toHaveBeenCalled()
+    session.displayCfi?.('epubcfi(x)')
+    expect(mocks.display).toHaveBeenCalledWith('epubcfi(x)')
+    session.destroy()
   })
 })

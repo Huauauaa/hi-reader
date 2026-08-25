@@ -4,6 +4,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { ReaderShell } from '../components/reader/ReaderShell'
 import { createTxtSession } from '../lib/readers/txtSession'
 import { progressStore, clearAllProgressForTests } from '../lib/progress/store'
+import { clearAllAnnotationsForTests } from '../lib/annotations/store'
 import type { BookSession } from '../lib/readers/types'
 
 function longBook() {
@@ -20,6 +21,7 @@ function renderShell(session: BookSession, bookId = 't1') {
 
 beforeEach(async () => {
   await clearAllProgressForTests()
+  await clearAllAnnotationsForTests()
   Object.defineProperty(window, 'matchMedia', {
     writable: true,
     value: (query: string) => ({
@@ -33,6 +35,7 @@ beforeEach(async () => {
 
 afterEach(() => {
   cleanup()
+  vi.restoreAllMocks()
 })
 
 describe('ReaderShell', () => {
@@ -95,13 +98,40 @@ describe('ReaderShell', () => {
     expect(session.getFontScale()).toBeGreaterThan(1)
   })
 
-  it('toasts 即将推出 for 批注 and 笔记', () => {
+  it('opens NotesPanel from 笔记', () => {
     const session = createTxtSession(longBook(), 'Test Book')
     renderShell(session)
-    fireEvent.click(screen.getByRole('button', { name: '批注' }))
-    expect(screen.getByRole('status')).toHaveTextContent('即将推出')
     fireEvent.click(screen.getByRole('button', { name: '笔记' }))
-    expect(screen.getByRole('status')).toHaveTextContent('即将推出')
+    expect(screen.getByRole('heading', { name: '笔记' })).toBeInTheDocument()
+  })
+
+  it('toasts PDF tip on 批注 and can add a page note', async () => {
+    const canvas = document.createElement('canvas')
+    const session: BookSession = {
+      format: 'pdf',
+      title: '示例 PDF',
+      getToc: () => [{ id: 'p0', label: '第 1 页', page: 0 }],
+      getPageCount: () => 2,
+      getPage: () => ({ type: 'pdf', canvas }),
+      goToPage: () => {},
+      next: () => {},
+      prev: () => {},
+      getCurrentPage: () => 0,
+      setLayout: () => {},
+      getLayout: () => 'single',
+      setFontScale: () => {},
+      getFontScale: () => 1,
+      destroy: () => {},
+    }
+    vi.spyOn(window, 'prompt').mockReturnValue('页备注')
+    renderShell(session, 'pdf-1')
+    fireEvent.click(screen.getByRole('button', { name: '批注' }))
+    expect(screen.getByRole('status')).toHaveTextContent('PDF 请使用笔记添加页备注')
+    fireEvent.click(screen.getByRole('button', { name: '笔记' }))
+    fireEvent.click(screen.getByRole('button', { name: '为本页添加笔记' }))
+    await waitFor(() => {
+      expect(screen.getByText('页备注')).toBeInTheDocument()
+    })
   })
 
   it('debounces progress save on page change', async () => {

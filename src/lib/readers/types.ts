@@ -24,4 +24,7 @@ export type BookSession = {
   destroy(): void
   attach?(el: HTMLElement, layout?: 'single' | 'double'): void
   display?(page: number): void
+  onSelected?(cb: (sel: { cfi: string; quote: string }) => void): () => void
+  applyHighlights?(items: { cfi: string; color: string }[]): void
+  displayCfi?(cfi: string): void
 }

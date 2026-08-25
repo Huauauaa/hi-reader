@@ -3,14 +3,18 @@ import { Link } from 'react-router-dom'
 import { BookOpen } from '@phosphor-icons/react'
 import { EpubView } from './EpubView'
 import { FontPanel } from './FontPanel'
+import { NotesPanel } from './NotesPanel'
 import { PdfView } from './PdfView'
 import { ReaderToolbar, type ReaderPanel } from './ReaderToolbar'
 import { ThemePanel } from './ThemePanel'
 import { TocPanel } from './TocPanel'
 import { TxtView } from './TxtView'
 import { Toast } from '../ui/Toast'
+import { annotationsStore } from '../../lib/annotations/store'
+import { pageForOffset } from '../../lib/annotations/txtAnchors'
 import { progressStore } from '../../lib/progress/store'
 import type { BookSession } from '../../lib/readers/types'
+import type { Annotation } from '../../types/annotation'
 import type { ReadingProgress } from '../../types/book'
 
 type Props = {
@@ -38,9 +42,12 @@ export function ReaderShell({ session, bookId, initialTheme = 'dark' }: Props) {
   const [panel, setPanel] = useState<ReaderPanel | null>(null)
   const [toast, setToast] = useState<string | null>(null)
   const [rev, setRev] = useState(0)
+  const [notes, setNotes] = useState<Annotation[]>([])
+  const [notesRev, setNotesRev] = useState(0)
   const narrow = useNarrow()
 
   const bump = () => setRev((n) => n + 1)
+  const refreshNotes = () => setNotesRev((n) => n + 1)
   const layout = session.getLayout()
   const effectiveLayout = narrow ? 'single' : layout
   const page = session.getCurrentPage()
@@ -51,6 +58,10 @@ export function ReaderShell({ session, bookId, initialTheme = 'dark' }: Props) {
     session.goToPage(page + delta)
     bump()
   }
+
+  useEffect(() => {
+    void annotationsStore.list(bookId).then(setNotes)
+  }, [bookId, notesRev])
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
@@ -91,6 +102,48 @@ export function ReaderShell({ session, bookId, initialTheme = 'dark' }: Props) {
 
   useEffect(() => () => persistRef.current(), [])
 
+  function jumpTo(a: Annotation) {
+    if (a.anchor?.chapterId && session.displayCfi) {
+      session.displayCfi(a.anchor.chapterId)
+    } else if (a.anchor && session.format === 'txt') {
+      session.goToPage(pageForOffset(session, a.anchor.start))
+    } else if (a.page != null) {
+      session.goToPage(a.page)
+    }
+    bump()
+    setPanel(null)
+  }
+
+  async function editNote(id: string) {
+    const cur = notes.find((n) => n.id === id)
+    const body = window.prompt('编辑笔记', cur?.body ?? cur?.anchor?.quote ?? '')
+    if (body == null) return
+    await annotationsStore.update(id, { body })
+    refreshNotes()
+  }
+
+  async function deleteNote(id: string) {
+    await annotationsStore.remove(id)
+    refreshNotes()
+  }
+
+  async function addPageNote() {
+    const body = window.prompt('为本页添加笔记')
+    if (body == null || !body.trim()) return
+    await annotationsStore.add({
+      bookId,
+      kind: 'note',
+      page,
+      body: body.trim(),
+    })
+    refreshNotes()
+  }
+
+  async function addBookmark() {
+    await annotationsStore.add({ bookId, kind: 'bookmark', page })
+    refreshNotes()
+  }
+
   const pageLabel =
     effectiveLayout === 'double' && page + 1 < count
       ? `${page + 1}–${page + 2} / ${count}`
@@ -114,9 +167,22 @@ export function ReaderShell({ session, bookId, initialTheme = 'dark' }: Props) {
 
       <main className="flex min-h-0 flex-1 flex-col px-4 pb-2 pr-16 md:px-16 md:pr-24">
         {session.format === 'txt' ? (
-          <TxtView session={session} layout={effectiveLayout} />
+          <TxtView
+            session={session}
+            layout={effectiveLayout}
+            bookId={bookId}
+            annotations={notes}
+            onChanged={refreshNotes}
+          />
         ) : session.format === 'epub' ? (
-          <EpubView session={session} layout={effectiveLayout} theme={theme} />
+          <EpubView
+            session={session}
+            layout={effectiveLayout}
+            theme={theme}
+            bookId={bookId}
+            annotations={notes}
+            onChanged={refreshNotes}
+          />
         ) : session.format === 'pdf' ? (
           <PdfView session={session} layout={effectiveLayout} />
         ) : (
@@ -152,7 +218,10 @@ export function ReaderShell({ session, bookId, initialTheme = 'dark' }: Props) {
           session.setLayout(layout === 'single' ? 'double' : 'single')
           bump()
         }}
-        onSoon={() => setToast('即将推出')}
+        onAnnotate={() => {
+          if (session.format === 'pdf') setToast('PDF 请使用笔记添加页备注')
+          else setToast('请选择文字后高亮或写笔记')
+        }}
       />
 
       {panel ? (
@@ -178,6 +247,18 @@ export function ReaderShell({ session, bookId, initialTheme = 'dark' }: Props) {
             />
           ) : null}
           {panel === 'theme' ? <ThemePanel theme={theme} onChange={setTheme} /> : null}
+          {panel === 'notes' ? (
+            <NotesPanel
+              items={notes}
+              format={session.format}
+              currentPage={page}
+              onJump={jumpTo}
+              onEdit={(id) => void editNote(id)}
+              onDelete={(id) => void deleteNote(id)}
+              onAddPageNote={session.format === 'pdf' ? () => void addPageNote() : undefined}
+              onAddBookmark={session.format === 'pdf' ? () => void addBookmark() : undefined}
+            />
+          ) : null}
         </aside>
       ) : null}
 

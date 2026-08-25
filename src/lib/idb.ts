@@ -1,3 +1,4 @@
+import type { Annotation } from '../types/annotation'
 import type { BookMeta, ReadingProgress } from '../types/book'
 
 const DB_NAME = 'hi-reader'
@@ -63,4 +64,13 @@ export const idb = {
   putProgress: (p: ReadingProgress) =>
     tx<IDBValidKey>('progress', 'readwrite', (s) => s.put(p)),
   clearProgress: () => tx<undefined>('progress', 'readwrite', (s) => s.clear()),
+  getAnnotation: (id: string) =>
+    tx<Annotation | undefined>('annotations', 'readonly', (s) => s.get(id)),
+  putAnnotation: (a: Annotation) =>
+    tx<IDBValidKey>('annotations', 'readwrite', (s) => s.put(a)),
+  deleteAnnotation: (id: string) =>
+    tx<undefined>('annotations', 'readwrite', (s) => s.delete(id)),
+  // ponytail: scan-all; add bookId index if a library grows
+  listAnnotations: () => tx<Annotation[]>('annotations', 'readonly', (s) => s.getAll()),
+  clearAnnotations: () => tx<undefined>('annotations', 'readwrite', (s) => s.clear()),
 }

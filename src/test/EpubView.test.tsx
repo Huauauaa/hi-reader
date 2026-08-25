@@ -2,6 +2,7 @@ import { render, cleanup } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { EpubView } from '../components/reader/EpubView'
 import type { BookSession } from '../lib/readers/types'
+import type { Annotation } from '../types/annotation'
 
 afterEach(() => {
   cleanup()
@@ -30,9 +31,11 @@ function fakeEpub(overrides: Partial<BookSession> = {}): BookSession {
 }
 
 describe('EpubView', () => {
+  const extra = { bookId: 'e1', annotations: [] as Annotation[], onChanged: () => {} }
+
   it('attaches the session to a host element and displays the current page', () => {
     const session = fakeEpub()
-    render(<EpubView session={session} layout="single" />)
+    render(<EpubView session={session} layout="single" {...extra} />)
     expect(session.attach).toHaveBeenCalled()
     const el = (session.attach as ReturnType<typeof vi.fn>).mock.calls[0][0]
     expect(el).toBeInstanceOf(HTMLElement)
@@ -42,15 +45,15 @@ describe('EpubView', () => {
 
   it('passes double layout through to attach', () => {
     const session = fakeEpub()
-    render(<EpubView session={session} layout="double" />)
+    render(<EpubView session={session} layout="double" {...extra} />)
     expect((session.attach as ReturnType<typeof vi.fn>).mock.calls[0][1]).toBe('double')
   })
 
   it('re-attaches when theme changes', () => {
     const session = fakeEpub()
-    const { rerender } = render(<EpubView session={session} layout="single" theme="dark" />)
+    const { rerender } = render(<EpubView session={session} layout="single" theme="dark" {...extra} />)
     const n = (session.attach as ReturnType<typeof vi.fn>).mock.calls.length
-    rerender(<EpubView session={session} layout="single" theme="light" />)
+    rerender(<EpubView session={session} layout="single" theme="light" {...extra} />)
     expect((session.attach as ReturnType<typeof vi.fn>).mock.calls.length).toBeGreaterThan(n)
   })
 })

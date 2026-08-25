@@ -88,6 +88,20 @@ export async function createEpubSession(blob: Blob, title: string): Promise<Book
   let currentPage = 0
   let host: HTMLElement | null = null
   let rendition: Rendition | null = null
+  let selectedCb: ((sel: { cfi: string; quote: string }) => void) | null = null
+  let applied: string[] = []
+
+  function bindSelected(r: Rendition) {
+    r.on('selected', (cfi: string, contents: { range: (c: string) => Range }) => {
+      let quote = ''
+      try {
+        quote = contents.range(cfi)?.toString() ?? ''
+      } catch {
+        quote = ''
+      }
+      selectedCb?.({ cfi, quote: quote || cfi })
+    })
+  }
 
   function hrefFor(page: number): string {
     return spine[Math.max(0, Math.min(page, last))]?.href ?? ''
@@ -157,6 +171,7 @@ export async function createEpubSession(blob: Blob, title: string): Promise<Book
         return
       }
       rendition?.destroy()
+      applied = []
       host = el
       rendition = book.renderTo(el, {
         width: '100%',
@@ -165,6 +180,7 @@ export async function createEpubSession(blob: Blob, title: string): Promise<Book
         spread,
         allowScriptedContent: false,
       })
+      bindSelected(rendition)
       applyChrome(rendition, host, fontScale)
       void Promise.resolve(rendition.display(hrefFor(currentPage))).then(() => {
         if (rendition) applyChrome(rendition, host, fontScale)
@@ -179,10 +195,50 @@ export async function createEpubSession(blob: Blob, title: string): Promise<Book
       })
     },
 
+    onSelected(cb: (sel: { cfi: string; quote: string }) => void): () => void {
+      selectedCb = cb
+      return () => {
+        if (selectedCb === cb) selectedCb = null
+      }
+    },
+
+    applyHighlights(items: { cfi: string; color: string }[]): void {
+      if (!rendition) return
+      for (const cfi of applied) {
+        try {
+          rendition.annotations.remove(cfi, 'highlight')
+        } catch {
+          /* ponytail: epubjs throws if the CFI section is not on screen */
+        }
+      }
+      applied = []
+      for (const it of items) {
+        rendition.annotations.highlight(it.cfi, {}, undefined, 'hi-hl', {
+          fill: it.color,
+          'fill-opacity': '0.4',
+        })
+        applied.push(it.cfi)
+      }
+    },
+
+    displayCfi(cfi: string): void {
+      const item = book.spine.get(cfi) as SpineItem | undefined
+      if (item) {
+        const idx = spine.findIndex((s) => s.href === item.href || s.index === item.index)
+        if (idx >= 0) currentPage = idx
+      }
+      if (!rendition) return
+      void Promise.resolve(rendition.display(cfi)).then(() => {
+        if (rendition) applyChrome(rendition, host, fontScale)
+      })
+    },
+
     destroy(): void {
       rendition?.destroy()
       rendition = null
       host = null
+      selectedCb = null
+      applied = []
       book.destroy()
     },
   }
