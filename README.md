@@ -5,8 +5,8 @@ Offline-first reader for PDF, TXT, and EPUB. Built with React, Vite, and Indexed
 ## Install & dev
 
 ```bash
-npm ci
-npm run dev
+pnpm install
+pnpm dev
 ```
 
 Open the URL Vite prints (default `http://localhost:5173/hi-reader/`). Sample books appear on the shelf; try `/hi-reader/read/sample-txt`.
@@ -15,13 +15,13 @@ Other scripts:
 
 | Command | Purpose |
 |---------|---------|
-| `npm test` | Run Vitest once |
-| `npm run build` | Typecheck + production build to `dist/` |
-| `npm run preview` | Serve the built `dist/` locally |
+| `pnpm test` | Run Vitest once |
+| `pnpm build` | Typecheck + production build to `dist/` |
+| `pnpm preview` | Serve the built `dist/` locally |
 
 ## GitHub Pages deploy
 
-This repo ships a [GitHub Actions workflow](.github/workflows/deploy.yml) that runs on every push to `main`: `npm ci`, `npm test`, then `npm run build` with `BASE_PATH=/hi-reader/`, and deploys `dist/` to GitHub Pages.
+This repo ships a [GitHub Actions workflow](.github/workflows/deploy.yml) that runs on every push to `main`: `pnpm ci`, `pnpm test`, then `pnpm build` with `BASE_PATH=/hi-reader/`, and deploys `dist/` to GitHub Pages.
 
 **One-time setup**
 
@@ -40,7 +40,7 @@ The build copies `index.html` → `404.html`. GitHub Pages serves `404.html` for
 Local production check:
 
 ```bash
-BASE_PATH=/hi-reader/ npm run build && npm run preview
+BASE_PATH=/hi-reader/ pnpm build && pnpm preview
 ```
 
 Then open the preview URL and navigate to `/hi-reader/read/sample-txt`.
