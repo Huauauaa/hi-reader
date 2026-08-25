@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { ReaderShell } from '../components/reader/ReaderShell'
+import { Toast } from '../components/ui/Toast'
 import { loadCatalog } from '../lib/books/catalog'
 import { progressStore } from '../lib/progress/store'
 import { openSession } from '../lib/readers/openSession'
@@ -12,6 +13,7 @@ export function ReaderPage() {
   const [session, setSession] = useState<BookSession | null>(null)
   const [theme, setTheme] = useState<ReadingProgress['theme']>('dark')
   const [error, setError] = useState<string | null>(null)
+  const [toast, setToast] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -19,6 +21,7 @@ export function ReaderPage() {
     let opened: BookSession | null = null
     setLoading(true)
     setError(null)
+    setToast(null)
     setSession(null)
 
     ;(async () => {
@@ -41,7 +44,11 @@ export function ReaderPage() {
         setTheme(progress?.theme ?? 'dark')
         setSession(s)
       } catch (e) {
-        if (!cancelled) setError(e instanceof Error ? e.message : '打开失败')
+        if (!cancelled) {
+          const msg = e instanceof Error ? e.message : '打开失败'
+          setError(msg)
+          setToast(msg)
+        }
       } finally {
         if (!cancelled) setLoading(false)
       }
@@ -68,6 +75,7 @@ export function ReaderPage() {
         <Link to="/" className="text-sm opacity-70 hover:opacity-100">
           返回书架
         </Link>
+        <Toast message={toast} onClose={() => setToast(null)} />
       </div>
     )
   }

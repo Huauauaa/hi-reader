@@ -142,12 +142,21 @@ describe('ReaderPage', () => {
 
   it('shows not-found when id is missing from catalog', async () => {
     renderRead('no-such-book')
-    expect(await screen.findByText(/找不到/)).toBeInTheDocument()
+    expect(await screen.findByRole('status')).toHaveTextContent(/找不到/)
+    expect(screen.getByRole('link', { name: '返回书架' })).toHaveAttribute('href', '/')
+  })
+
+  it('toasts and links back to shelf when openSession fails', async () => {
+    createEpubSession.mockRejectedValueOnce(new Error('corrupt epub'))
+    renderRead('sample-epub')
+    expect(await screen.findByRole('status')).toHaveTextContent('corrupt epub')
+    expect(screen.getByRole('link', { name: '返回书架' })).toHaveAttribute('href', '/')
   })
 
   it('opens a local book when books.json fetch fails', async () => {
     const file = new File([TXT], 'mine.txt', { type: 'text/plain' })
     const meta = await booksStore.addLocal(file, 'Local Book')
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
     vi.stubGlobal(
       'fetch',
       vi.fn(async (url: string) => {
@@ -157,5 +166,7 @@ describe('ReaderPage', () => {
     )
     renderRead(meta.id)
     expect(await screen.findByRole('heading', { name: 'Local Book' })).toBeInTheDocument()
+    expect(warn).toHaveBeenCalled()
+    warn.mockRestore()
   })
 })

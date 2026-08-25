@@ -49,6 +49,7 @@ it('loadCatalog merges samples then local', async () => {
 it('loadCatalog still returns local books if samples fetch fails', async () => {
   const file = new File(['x'], 'mine.txt', { type: 'text/plain' })
   await booksStore.addLocal(file, 'My Book')
+  const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
   vi.stubGlobal(
     'fetch',
     vi.fn(async () => {
@@ -57,4 +58,32 @@ it('loadCatalog still returns local books if samples fetch fails', async () => {
   )
   const catalog = await loadCatalog()
   expect(catalog).toEqual([expect.objectContaining({ title: 'My Book', source: 'local' })])
+  expect(warn).toHaveBeenCalled()
+  warn.mockRestore()
+})
+
+it('skips broken sample cards and warns', async () => {
+  const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+  vi.stubGlobal(
+    'fetch',
+    vi.fn(async (url: string) => {
+      if (String(url).endsWith('books.json')) {
+        return {
+          ok: true,
+          json: async () => [
+            { id: 'ok', title: 'Good', format: 'txt', source: 'sample', filePath: 'books/ok.txt' },
+            { id: 'empty-title', title: '', format: 'txt', source: 'sample', filePath: 'books/x.txt' },
+            { id: 'nopath', title: 'No path', format: 'txt', source: 'sample' },
+            { id: 'bad-fmt', title: 'Doc', format: 'docx', source: 'sample', filePath: 'books/x.docx' },
+            { not: 'a book' },
+          ],
+        }
+      }
+      throw new Error(`unexpected fetch: ${url}`)
+    }),
+  )
+  const catalog = await loadCatalog()
+  expect(catalog.map((b) => b.id)).toEqual(['ok'])
+  expect(warn).toHaveBeenCalled()
+  warn.mockRestore()
 })
