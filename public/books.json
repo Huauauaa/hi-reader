@@ -22,5 +22,13 @@
     "source": "sample",
     "filePath": "books/sample.epub",
     "coverUrl": ""
+  },
+  {
+    "id": "wuren-shenghuan",
+    "title": "无人生还",
+    "format": "epub",
+    "source": "sample",
+    "filePath": "books/无人生还 (（英）阿加莎·克里斯蒂著；夏阳译) .epub",
+    "coverUrl": ""
   }
 ]

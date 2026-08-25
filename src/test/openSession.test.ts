@@ -119,6 +119,27 @@ it('opens a sample epub via createEpubSession', async () => {
   session.destroy()
 })
 
+it('percent-encodes spaces and CJK in sample filePath', async () => {
+  const fetchMock = vi.fn(async (url: string) => {
+    if (String(url).includes(encodeURI('无人生还 .epub'))) {
+      return { ok: true, blob: async () => new Blob(['epub-bytes']) }
+    }
+    return { ok: false, status: 404, blob: async () => new Blob([]) }
+  })
+  vi.stubGlobal('fetch', fetchMock)
+  const session = await openSession({
+    ...sampleTxt,
+    id: 'wuren',
+    title: '无人生还',
+    format: 'epub',
+    filePath: 'books/无人生还 .epub',
+  })
+  expect(fetchMock).toHaveBeenCalledWith(
+    expect.stringContaining(encodeURI('books/无人生还 .epub')),
+  )
+  session.destroy()
+})
+
 it('opens a sample pdf via createPdfSession', async () => {
   vi.stubGlobal(
     'fetch',

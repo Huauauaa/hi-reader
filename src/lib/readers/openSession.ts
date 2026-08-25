@@ -6,7 +6,8 @@ import type { BookSession } from './types'
 import type { BookMeta } from '../../types/book'
 
 function sampleUrl(filePath: string): string {
-  return `${import.meta.env.BASE_URL}${filePath.replace(/^\//, '')}`
+  // encodeURI keeps `/`; percent-encodes spaces / CJK / punctuation in filenames
+  return `${import.meta.env.BASE_URL}${encodeURI(filePath.replace(/^\//, ''))}`
 }
 
 export async function loadBlob(meta: BookMeta): Promise<Blob> {
