@@ -47,9 +47,9 @@ export const booksStore = {
   async removeLocal(id: string): Promise<void> {
     await idb.deleteBook(id)
   },
+}
 
-  /** Test helper — clears all books from IDB */
-  async clearAll(): Promise<void> {
-    await idb.clearBooks()
-  },
+/** Test-only — clears all books from IDB */
+export async function clearAllBooksForTests(): Promise<void> {
+  await idb.clearBooks()
 }
