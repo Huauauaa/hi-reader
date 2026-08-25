@@ -24,7 +24,27 @@ const createEpubSession = vi.hoisted(() =>
   })),
 )
 
+const createPdfSession = vi.hoisted(() =>
+  vi.fn(async (_blob: Blob, title: string): Promise<BookSession> => ({
+    format: 'pdf',
+    title,
+    getToc: () => [{ id: 'p0', label: '第 1 页', page: 0 }],
+    getPageCount: () => 1,
+    getPage: () => ({ type: 'pdf', canvas: document.createElement('canvas') }),
+    goToPage: () => {},
+    next: () => {},
+    prev: () => {},
+    getCurrentPage: () => 0,
+    setLayout: () => {},
+    getLayout: () => 'single',
+    setFontScale: () => {},
+    getFontScale: () => 1,
+    destroy: () => {},
+  })),
+)
+
 vi.mock('../lib/readers/epubSession', () => ({ createEpubSession }))
+vi.mock('../lib/readers/pdfSession', () => ({ createPdfSession }))
 
 const sampleTxt: BookMeta = {
   id: 'sample-txt',
@@ -92,10 +112,27 @@ it('opens a sample epub via createEpubSession', async () => {
   session.destroy()
 })
 
-it('throws a clear error for pdf until Task 9', async () => {
-  await expect(
-    openSession({ ...sampleTxt, id: 'sample-pdf', format: 'pdf', filePath: 'books/sample.pdf' }),
-  ).rejects.toThrow(/PDF/)
+it('opens a sample pdf via createPdfSession', async () => {
+  vi.stubGlobal(
+    'fetch',
+    vi.fn(async (url: string) => {
+      if (String(url).endsWith('books/sample.pdf')) {
+        return { ok: true, blob: async () => new Blob(['pdf-bytes']) }
+      }
+      return { ok: false, status: 404, blob: async () => new Blob([]) }
+    }),
+  )
+  const session = await openSession({
+    ...sampleTxt,
+    id: 'sample-pdf',
+    title: '示例 PDF',
+    format: 'pdf',
+    filePath: 'books/sample.pdf',
+  })
+  expect(session.format).toBe('pdf')
+  expect(session.title).toBe('示例 PDF')
+  expect(createPdfSession).toHaveBeenCalled()
+  session.destroy()
 })
 
 it('throws when sample filePath is missing', async () => {

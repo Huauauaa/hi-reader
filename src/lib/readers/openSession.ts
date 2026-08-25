@@ -1,5 +1,6 @@
 import { booksStore } from '../books/store'
 import { createEpubSession } from './epubSession'
+import { createPdfSession } from './pdfSession'
 import { createTxtSession } from './txtSession'
 import type { BookSession } from './types'
 import type { BookMeta } from '../../types/book'
@@ -21,10 +22,9 @@ async function loadBlob(meta: BookMeta): Promise<Blob> {
 }
 
 export async function openSession(meta: BookMeta): Promise<BookSession> {
-  if (meta.format === 'pdf') throw new Error('PDF 阅读功能即将推出')
-
   const blob = await loadBlob(meta)
   if (meta.format === 'epub') return createEpubSession(blob, meta.title)
+  if (meta.format === 'pdf') return createPdfSession(blob, meta.title)
   const text = await blob.text()
   return createTxtSession(text, meta.title)
 }

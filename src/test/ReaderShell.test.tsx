@@ -135,6 +135,29 @@ describe('ReaderShell', () => {
     expect(screen.getByRole('button', { name: '下一页' })).toBeDisabled()
   })
 
+  it('renders PdfView for a pdf session', () => {
+    const canvas = document.createElement('canvas')
+    const session: BookSession = {
+      format: 'pdf',
+      title: '示例 PDF',
+      getToc: () => [{ id: 'p0', label: '第 1 页', page: 0 }],
+      getPageCount: () => 2,
+      getPage: () => ({ type: 'pdf', canvas }),
+      goToPage: () => {},
+      next: () => {},
+      prev: () => {},
+      getCurrentPage: () => 0,
+      setLayout: () => {},
+      getLayout: () => 'single',
+      setFontScale: () => {},
+      getFontScale: () => 1,
+      destroy: () => {},
+    }
+    renderShell(session)
+    expect(screen.getByRole('heading', { name: '示例 PDF' })).toBeInTheDocument()
+    expect(document.querySelector('[data-reader-page] canvas')).toBe(canvas)
+  })
+
   it('renders EpubView for an epub session', () => {
     const attach = vi.fn()
     const session: BookSession = {

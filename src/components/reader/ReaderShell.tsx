@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { BookOpen } from '@phosphor-icons/react'
 import { EpubView } from './EpubView'
 import { FontPanel } from './FontPanel'
+import { PdfView } from './PdfView'
 import { ReaderToolbar, type ReaderPanel } from './ReaderToolbar'
 import { ThemePanel } from './ThemePanel'
 import { TocPanel } from './TocPanel'
@@ -116,6 +117,8 @@ export function ReaderShell({ session, bookId, initialTheme = 'dark' }: Props) {
           <TxtView session={session} layout={effectiveLayout} />
         ) : session.format === 'epub' ? (
           <EpubView session={session} layout={effectiveLayout} theme={theme} />
+        ) : session.format === 'pdf' ? (
+          <PdfView session={session} layout={effectiveLayout} />
         ) : (
           <p className="p-8 text-sm opacity-60">该格式尚未接入阅读视图</p>
         )}

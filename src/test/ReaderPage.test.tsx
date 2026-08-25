@@ -28,7 +28,27 @@ const createEpubSession = vi.hoisted(() =>
   })),
 )
 
+const createPdfSession = vi.hoisted(() =>
+  vi.fn(async (_blob: Blob, title: string): Promise<BookSession> => ({
+    format: 'pdf',
+    title,
+    getToc: () => [{ id: 'p0', label: '第 1 页', page: 0 }],
+    getPageCount: () => 1,
+    getPage: () => ({ type: 'pdf', canvas: document.createElement('canvas') }),
+    goToPage: () => {},
+    next: () => {},
+    prev: () => {},
+    getCurrentPage: () => 0,
+    setLayout: () => {},
+    getLayout: () => 'single',
+    setFontScale: () => {},
+    getFontScale: () => 1,
+    destroy: () => {},
+  })),
+)
+
 vi.mock('../lib/readers/epubSession', () => ({ createEpubSession }))
+vi.mock('../lib/readers/pdfSession', () => ({ createPdfSession }))
 
 const samples: BookMeta[] = [
   { id: 'sample-txt', title: '示例 TXT', format: 'txt', source: 'sample', filePath: 'books/sample.txt' },
@@ -73,6 +93,9 @@ beforeEach(async () => {
       if (u.endsWith('books/sample.epub')) {
         return { ok: true, blob: async () => new Blob(['epub-bytes']) }
       }
+      if (u.endsWith('books/sample.pdf')) {
+        return { ok: true, blob: async () => new Blob(['pdf-bytes']) }
+      }
       return { ok: false, status: 404, blob: async () => new Blob([]) }
     }),
   )
@@ -90,10 +113,10 @@ describe('ReaderPage', () => {
     expect(screen.getByText(/AAA/)).toBeInTheDocument()
   })
 
-  it('shows a stub error for PDF', async () => {
+  it('loads a sample PDF end-to-end', async () => {
     renderRead('sample-pdf')
-    expect(await screen.findByText(/PDF/)).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: '返回书架' })).toHaveAttribute('href', '/')
+    expect(await screen.findByRole('heading', { name: '示例 PDF' })).toBeInTheDocument()
+    expect(document.querySelector('[data-reader-page] canvas')).toBeTruthy()
   })
 
   it('loads a sample EPUB end-to-end', async () => {
