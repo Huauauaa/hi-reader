@@ -10,3 +10,36 @@
 }
 
 html, body, #root { height: 100%; margin: 0; }
+
+.reader-root {
+  min-height: 100%;
+  background: var(--reader-bg);
+  color: var(--page-ink);
+}
+
+.reader-root[data-theme="dark"] {
+  --reader-bg: #1a1a1a;
+  --page-bg: #2a2a2a;
+  --page-ink: #e8e8e8;
+}
+
+.reader-root[data-theme="light"] {
+  --reader-bg: #f5f5f5;
+  --page-bg: #ffffff;
+  --page-ink: #1a1a1a;
+}
+
+.reader-root[data-theme="sepia"] {
+  --reader-bg: #e8dcc8;
+  --page-bg: #f4ecd8;
+  --page-ink: #3b2f2f;
+}
+
+.reader-panel {
+  animation: reader-panel-in 180ms ease-out;
+}
+
+@keyframes reader-panel-in {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}

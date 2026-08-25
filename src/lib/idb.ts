@@ -1,4 +1,4 @@
-import type { BookMeta } from '../types/book'
+import type { BookMeta, ReadingProgress } from '../types/book'
 
 const DB_NAME = 'hi-reader'
 const DB_VERSION = 1
@@ -58,4 +58,9 @@ export const idb = {
   listBooks: () =>
     tx<BookRecord[]>('books', 'readonly', (s) => s.getAll()),
   clearBooks: () => tx<undefined>('books', 'readwrite', (s) => s.clear()),
+  getProgress: (bookId: string) =>
+    tx<ReadingProgress | undefined>('progress', 'readonly', (s) => s.get(bookId)),
+  putProgress: (p: ReadingProgress) =>
+    tx<IDBValidKey>('progress', 'readwrite', (s) => s.put(p)),
+  clearProgress: () => tx<undefined>('progress', 'readwrite', (s) => s.clear()),
 }
