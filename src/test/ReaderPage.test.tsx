@@ -29,22 +29,25 @@ const createEpubSession = vi.hoisted(() =>
 )
 
 const createPdfSession = vi.hoisted(() =>
-  vi.fn(async (_blob: Blob, title: string): Promise<BookSession> => ({
-    format: 'pdf',
-    title,
-    getToc: () => [{ id: 'p0', label: '第 1 页', page: 0 }],
-    getPageCount: () => 1,
-    getPage: () => ({ type: 'pdf', canvas: document.createElement('canvas') }),
-    goToPage: () => {},
-    next: () => {},
-    prev: () => {},
-    getCurrentPage: () => 0,
-    setLayout: () => {},
-    getLayout: () => 'single',
-    setFontScale: () => {},
-    getFontScale: () => 1,
-    destroy: () => {},
-  })),
+  vi.fn(async (_blob: Blob, title: string): Promise<BookSession> => {
+    const canvas = document.createElement('canvas')
+    return {
+      format: 'pdf',
+      title,
+      getToc: () => [{ id: 'p0', label: '第 1 页', page: 0 }],
+      getPageCount: () => 1,
+      getPage: () => ({ type: 'pdf', canvas }),
+      goToPage: () => {},
+      next: () => {},
+      prev: () => {},
+      getCurrentPage: () => 0,
+      setLayout: () => {},
+      getLayout: () => 'single',
+      setFontScale: () => {},
+      getFontScale: () => 1,
+      destroy: () => {},
+    }
+  }),
 )
 
 vi.mock('../lib/readers/epubSession', () => ({ createEpubSession }))
