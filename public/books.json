@@ -1,0 +1,26 @@
+[
+  {
+    "id": "sample-txt",
+    "title": "示例 TXT",
+    "format": "txt",
+    "source": "sample",
+    "filePath": "books/sample.txt",
+    "coverUrl": ""
+  },
+  {
+    "id": "sample-pdf",
+    "title": "示例 PDF",
+    "format": "pdf",
+    "source": "sample",
+    "filePath": "books/sample.pdf",
+    "coverUrl": ""
+  },
+  {
+    "id": "sample-epub",
+    "title": "示例 EPUB",
+    "format": "epub",
+    "source": "sample",
+    "filePath": "books/sample.epub",
+    "coverUrl": ""
+  }
+]
