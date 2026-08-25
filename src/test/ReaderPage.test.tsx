@@ -3,7 +3,7 @@ import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { ReaderPage } from '../pages/ReaderPage'
 import { progressStore, clearAllProgressForTests } from '../lib/progress/store'
-import { clearAllBooksForTests } from '../lib/books/store'
+import { booksStore, clearAllBooksForTests } from '../lib/books/store'
 import type { BookMeta } from '../types/book'
 
 const samples: BookMeta[] = [
@@ -86,5 +86,19 @@ describe('ReaderPage', () => {
   it('shows not-found when id is missing from catalog', async () => {
     renderRead('no-such-book')
     expect(await screen.findByText(/找不到/)).toBeInTheDocument()
+  })
+
+  it('opens a local book when books.json fetch fails', async () => {
+    const file = new File([TXT], 'mine.txt', { type: 'text/plain' })
+    const meta = await booksStore.addLocal(file, 'Local Book')
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (url: string) => {
+        if (String(url).endsWith('books.json')) throw new Error('network down')
+        return { ok: false, status: 404, blob: async () => new Blob([]) }
+      }),
+    )
+    renderRead(meta.id)
+    expect(await screen.findByRole('heading', { name: 'Local Book' })).toBeInTheDocument()
   })
 })

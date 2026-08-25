@@ -2,8 +2,13 @@ import type { BookMeta } from '../../types/book'
 import { booksStore } from './store'
 
 export async function loadCatalog(): Promise<BookMeta[]> {
-  const res = await fetch(`${import.meta.env.BASE_URL}books.json`)
-  const samples = (await res.json()) as BookMeta[]
+  let samples: BookMeta[] = []
+  try {
+    const res = await fetch(`${import.meta.env.BASE_URL}books.json`)
+    if (res.ok) samples = (await res.json()) as BookMeta[]
+  } catch {
+    // ponytail: samples optional; local books still list/open if books.json fails
+  }
   const local = await booksStore.listLocal()
   return [...samples, ...local]
 }

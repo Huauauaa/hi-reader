@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { BookOpen } from '@phosphor-icons/react'
 import { FontPanel } from './FontPanel'
@@ -70,19 +70,24 @@ export function ReaderShell({ session, bookId, initialTheme = 'dark' }: Props) {
     // ponytail: rebind on page/layout; skip if input-focus ever appears
   }, [page, step])
 
+  const persistRef = useRef(() => {})
+  persistRef.current = () => {
+    void progressStore.save({
+      bookId,
+      page: session.getCurrentPage(),
+      layout: session.getLayout(),
+      theme,
+      fontScale: session.getFontScale(),
+      updatedAt: Date.now(),
+    })
+  }
+
   useEffect(() => {
-    const t = setTimeout(() => {
-      void progressStore.save({
-        bookId,
-        page: session.getCurrentPage(),
-        layout: session.getLayout(),
-        theme,
-        fontScale: session.getFontScale(),
-        updatedAt: Date.now(),
-      })
-    }, 200)
+    const t = setTimeout(() => persistRef.current(), 200)
     return () => clearTimeout(t)
   }, [bookId, session, theme, rev])
+
+  useEffect(() => () => persistRef.current(), [])
 
   const pageLabel =
     effectiveLayout === 'double' && page + 1 < count
@@ -125,7 +130,7 @@ export function ReaderShell({ session, bookId, initialTheme = 'dark' }: Props) {
         <span className="tabular-nums opacity-45">{pageLabel}</span>
         <button
           type="button"
-          disabled={page >= count - 1}
+          disabled={page + step >= count}
           onClick={() => go(step)}
           className="opacity-70 hover:opacity-100 disabled:opacity-25"
         >

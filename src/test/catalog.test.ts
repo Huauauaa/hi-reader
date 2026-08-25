@@ -45,3 +45,16 @@ it('loadCatalog merges samples then local', async () => {
   expect(catalog[1]).toMatchObject({ id: 'sample-pdf', source: 'sample' })
   expect(catalog[2]).toMatchObject({ title: 'My Book', source: 'local' })
 })
+
+it('loadCatalog still returns local books if samples fetch fails', async () => {
+  const file = new File(['x'], 'mine.txt', { type: 'text/plain' })
+  await booksStore.addLocal(file, 'My Book')
+  vi.stubGlobal(
+    'fetch',
+    vi.fn(async () => {
+      throw new Error('offline')
+    }),
+  )
+  const catalog = await loadCatalog()
+  expect(catalog).toEqual([expect.objectContaining({ title: 'My Book', source: 'local' })])
+})

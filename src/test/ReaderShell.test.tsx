@@ -113,4 +113,25 @@ describe('ReaderShell', () => {
       expect(p?.page).toBe(1)
     })
   })
+
+  it('flushes pending progress save on unmount', async () => {
+    const session = createTxtSession(longBook(), 'Test Book')
+    const { unmount } = renderShell(session, 't1')
+    fireEvent.click(screen.getByRole('button', { name: '下一页' }))
+    unmount()
+    await waitFor(async () => {
+      const p = await progressStore.get('t1')
+      expect(p?.page).toBe(1)
+    })
+  })
+
+  it('disables Next when remaining pages are fewer than the layout step', () => {
+    const session = createTxtSession(longBook(), 'Test Book')
+    session.setLayout('double')
+    const count = session.getPageCount()
+    session.goToPage(Math.max(0, count - 2))
+    renderShell(session)
+    expect(session.getCurrentPage() + 2 >= count).toBe(true)
+    expect(screen.getByRole('button', { name: '下一页' })).toBeDisabled()
+  })
 })

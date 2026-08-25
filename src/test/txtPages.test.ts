@@ -27,3 +27,10 @@ it('createTxtSession exposes toc, pages, and navigation', () => {
   expect(session.getCurrentPage()).toBe(1)
   session.destroy()
 })
+
+it('larger fontScale yields fewer chars per page', () => {
+  const session = createTxtSession('x'.repeat(900), 'Test Book')
+  expect(session.getPageCount()).toBe(1)
+  session.setFontScale(2)
+  expect(session.getPageCount()).toBe(2)
+})

@@ -6,7 +6,7 @@ const BASE_CHARS_DOUBLE = 450
 
 function charsPerPage(layout: 'single' | 'double', fontScale: number): number {
   const base = layout === 'single' ? BASE_CHARS_SINGLE : BASE_CHARS_DOUBLE
-  return Math.max(1, Math.round(base * fontScale))
+  return Math.max(1, Math.round(base / fontScale))
 }
 
 export function createTxtSession(text: string, title: string): BookSession {
