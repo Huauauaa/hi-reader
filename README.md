@@ -26,8 +26,8 @@ This repo ships a [GitHub Actions workflow](.github/workflows/deploy.yml) that r
 **One-time setup**
 
 1. Push this repo to GitHub (repo name should be `hi-reader` so the default base path `/hi-reader/` matches).
-2. **Settings → Pages → Build and deployment → Source:** choose **GitHub Actions**.
-3. Merge to `main`; the workflow publishes the site.
+2. **Settings → Pages → Build and deployment → Source:** choose **GitHub Actions** (required; otherwise deploy fails with HTTP 404).
+3. Push/merge to `main`, or re-run the workflow from the Actions tab.
 
 **Custom repo name or user/org Pages URL**
 
