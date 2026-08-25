@@ -9,7 +9,7 @@ function sampleUrl(filePath: string): string {
   return `${import.meta.env.BASE_URL}${filePath.replace(/^\//, '')}`
 }
 
-async function loadBlob(meta: BookMeta): Promise<Blob> {
+export async function loadBlob(meta: BookMeta): Promise<Blob> {
   if (meta.source === 'sample') {
     if (!meta.filePath) throw new Error('Sample book missing filePath')
     const res = await fetch(sampleUrl(meta.filePath))

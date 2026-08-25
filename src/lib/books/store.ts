@@ -47,6 +47,12 @@ export const booksStore = {
   async removeLocal(id: string): Promise<void> {
     await idb.deleteBook(id)
   },
+
+  async saveCover(id: string, coverUrl: string): Promise<void> {
+    const record = await idb.getBook(id)
+    if (!record) return
+    await idb.putBook({ ...record, meta: { ...record.meta, coverUrl } })
+  },
 }
 
 /** Test-only — clears all books from IDB */

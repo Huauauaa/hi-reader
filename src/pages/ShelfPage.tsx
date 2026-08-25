@@ -3,6 +3,7 @@ import { AddBookButton } from '../components/shelf/AddBookButton'
 import { ShelfGrid } from '../components/shelf/ShelfGrid'
 import { ShelfHeader } from '../components/shelf/ShelfHeader'
 import { Toast } from '../components/ui/Toast'
+import { fillMissingCovers } from '../lib/books/coverFromPage'
 import { filterByTitle, loadCatalog } from '../lib/books/catalog'
 import type { BookMeta } from '../types/book'
 
@@ -13,7 +14,12 @@ export function ShelfPage() {
   const [toast, setToast] = useState<string | null>(null)
 
   const refreshCatalog = useCallback(() => {
-    loadCatalog().then(setBooks).catch(() => setError('加载书架失败'))
+    loadCatalog()
+      .then(async (books) => {
+        setBooks(books)
+        setBooks(await fillMissingCovers(books))
+      })
+      .catch(() => setError('加载书架失败'))
   }, [])
 
   useEffect(() => {
