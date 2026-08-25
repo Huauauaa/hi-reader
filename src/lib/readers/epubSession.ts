@@ -90,6 +90,7 @@ export async function createEpubSession(blob: Blob, title: string): Promise<Book
   let rendition: Rendition | null = null
   let selectedCb: ((sel: { cfi: string; quote: string }) => void) | null = null
   let applied: string[] = []
+  let skipHrefDisplay = false
 
   function bindSelected(r: Rendition) {
     r.on('selected', (cfi: string, contents: { range: (c: string) => Range }) => {
@@ -190,6 +191,10 @@ export async function createEpubSession(blob: Blob, title: string): Promise<Book
     display(page: number): void {
       currentPage = clamp(page)
       if (!rendition) return
+      if (skipHrefDisplay) {
+        skipHrefDisplay = false
+        return
+      }
       void Promise.resolve(rendition.display(hrefFor(currentPage))).then(() => {
         if (rendition) applyChrome(rendition, host, fontScale)
       })
@@ -213,11 +218,15 @@ export async function createEpubSession(blob: Blob, title: string): Promise<Book
       }
       applied = []
       for (const it of items) {
-        rendition.annotations.highlight(it.cfi, {}, undefined, 'hi-hl', {
-          fill: it.color,
-          'fill-opacity': '0.4',
-        })
-        applied.push(it.cfi)
+        try {
+          rendition.annotations.highlight(it.cfi, {}, undefined, 'hi-hl', {
+            fill: it.color,
+            'fill-opacity': '0.4',
+          })
+          applied.push(it.cfi)
+        } catch {
+          /* ponytail: epubjs throws if the CFI section is not on screen */
+        }
       }
     },
 
@@ -225,7 +234,10 @@ export async function createEpubSession(blob: Blob, title: string): Promise<Book
       const item = book.spine.get(cfi) as SpineItem | undefined
       if (item) {
         const idx = spine.findIndex((s) => s.href === item.href || s.index === item.index)
-        if (idx >= 0) currentPage = idx
+        if (idx >= 0) {
+          if (rendition && idx !== currentPage) skipHrefDisplay = true
+          currentPage = idx
+        }
       }
       if (!rendition) return
       void Promise.resolve(rendition.display(cfi)).then(() => {

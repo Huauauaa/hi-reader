@@ -41,8 +41,10 @@ const mocks = vi.hoisted(() => {
       each: (fn: (s: typeof ch1) => void) => spineItems.forEach(fn),
       get: (t: string | number) => {
         if (typeof t === 'number') return spineItems[t]
-        const href = String(t).split('#')[0]
-        return spineItems.find((s) => s.href === href)
+        const s = String(t)
+        if (s.startsWith('epubcfi')) return ch2
+        const href = s.split('#')[0]
+        return spineItems.find((item) => item.href === href)
       },
     },
     renderTo,
@@ -157,6 +159,38 @@ describe('createEpubSession', () => {
     expect(mocks.highlight).toHaveBeenCalled()
     session.displayCfi?.('epubcfi(x)')
     expect(mocks.display).toHaveBeenCalledWith('epubcfi(x)')
+    session.destroy()
+  })
+
+  it('does not clobber a CFI jump with spine href display', async () => {
+    const session = await createEpubSession(new Blob(['x']), 'Book')
+    session.attach?.(document.createElement('div'))
+    mocks.display.mockClear()
+    session.displayCfi?.('epubcfi(/6/4)')
+    expect(session.getCurrentPage()).toBe(1)
+    session.display?.(session.getCurrentPage())
+    expect(mocks.display).toHaveBeenCalledTimes(1)
+    expect(mocks.display).toHaveBeenCalledWith('epubcfi(/6/4)')
+    session.goToPage(0)
+    session.display?.(0)
+    expect(mocks.display).toHaveBeenCalledWith('ch1.xhtml')
+    session.destroy()
+  })
+
+  it('keeps applying highlights after one CFI throws', async () => {
+    const session = await createEpubSession(new Blob(['x']), 'Book')
+    session.attach?.(document.createElement('div'))
+    mocks.highlight.mockImplementationOnce(() => {
+      throw new Error('bad cfi')
+    })
+    session.applyHighlights?.([
+      { cfi: 'bad', color: '#f7e08a' },
+      { cfi: 'good', color: '#00ff00' },
+    ])
+    expect(mocks.highlight).toHaveBeenCalledTimes(2)
+    session.applyHighlights?.([])
+    expect(mocks.remove).toHaveBeenCalledWith('good', 'highlight')
+    expect(mocks.remove).not.toHaveBeenCalledWith('bad', 'highlight')
     session.destroy()
   })
 })
