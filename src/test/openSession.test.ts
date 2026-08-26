@@ -119,9 +119,10 @@ it('opens a sample epub via createEpubSession', async () => {
   session.destroy()
 })
 
-it('percent-encodes spaces and CJK in sample filePath', async () => {
-  const fetchMock = vi.fn(async (url: string) => {
-    if (String(url).includes(encodeURI('无人生还 .epub'))) {
+it('fetches sample filePath as-is', async () => {
+  const url = '/hi-reader/assets/%E4%B9%A6.epub'
+  const fetchMock = vi.fn(async (u: string) => {
+    if (u === url) {
       return { ok: true, blob: async () => new Blob(['epub-bytes']) }
     }
     return { ok: false, status: 404, blob: async () => new Blob([]) }
@@ -130,13 +131,11 @@ it('percent-encodes spaces and CJK in sample filePath', async () => {
   const session = await openSession({
     ...sampleTxt,
     id: 'wuren',
-    title: '无人生还',
+    title: '书',
     format: 'epub',
-    filePath: 'books/无人生还 .epub',
+    filePath: url,
   })
-  expect(fetchMock).toHaveBeenCalledWith(
-    expect.stringContaining(encodeURI('books/无人生还 .epub')),
-  )
+  expect(fetchMock).toHaveBeenCalledWith(url)
   session.destroy()
 })
 

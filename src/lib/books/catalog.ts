@@ -1,5 +1,6 @@
 import type { BookFormat, BookMeta } from '../../types/book'
 import { booksStore } from './store'
+import { listSampleBooks } from './samples'
 
 const FORMATS = new Set<BookFormat>(['pdf', 'txt', 'epub'])
 
@@ -21,20 +22,7 @@ function isUsableBook(book: unknown): book is BookMeta {
 }
 
 export async function loadCatalog(): Promise<BookMeta[]> {
-  let samples: BookMeta[] = []
-  try {
-    const res = await fetch(`${import.meta.env.BASE_URL}books.json`)
-    if (res.ok) {
-      const raw: unknown = await res.json()
-      if (!Array.isArray(raw)) console.warn('sample catalog is not an array')
-      else samples = raw.filter(isUsableBook)
-    } else {
-      console.warn('sample catalog fetch failed', res.status)
-    }
-  } catch (e) {
-    // ponytail: samples optional; local books still list/open if books.json fails
-    console.warn('sample catalog unavailable', e)
-  }
+  const samples = listSampleBooks().filter(isUsableBook)
   const local = (await booksStore.listLocal()).filter(isUsableBook)
   return [...samples, ...local]
 }

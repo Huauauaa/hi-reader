@@ -5,7 +5,7 @@ import { PDFDocument, StandardFonts, rgb } from 'pdf-lib'
 import JSZip from 'jszip'
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..')
-const outDir = join(root, 'public/books')
+const outDir = join(root, 'src/books')
 mkdirSync(outDir, { recursive: true })
 
 async function writePdf() {
@@ -19,7 +19,7 @@ async function writePdf() {
     font,
     color: rgb(0.1, 0.1, 0.1),
   })
-  writeFileSync(join(outDir, 'sample.pdf'), await pdf.save())
+  writeFileSync(join(outDir, '示例 PDF.pdf'), await pdf.save())
 }
 
 async function writeEpub() {
@@ -77,11 +77,11 @@ async function writeEpub() {
 </ncx>`,
   )
   writeFileSync(
-    join(outDir, 'sample.epub'),
+    join(outDir, '示例 EPUB.epub'),
     await zip.generateAsync({ type: 'nodebuffer' }),
   )
 }
 
 await writePdf()
 await writeEpub()
-console.log('Wrote public/books/sample.pdf and sample.epub')
+console.log('Wrote src/books/示例 PDF.pdf and 示例 EPUB.epub')

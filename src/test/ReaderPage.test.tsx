@@ -59,23 +59,27 @@ const samples: BookMeta[] = [
     title: '示例 TXT',
     format: 'txt',
     source: 'sample',
-    filePath: 'books/sample.txt',
+    filePath: '/mock/books/sample.txt',
   },
   {
     id: 'sample-pdf',
     title: '示例 PDF',
     format: 'pdf',
     source: 'sample',
-    filePath: 'books/sample.pdf',
+    filePath: '/mock/books/sample.pdf',
   },
   {
     id: 'sample-epub',
     title: '示例 EPUB',
     format: 'epub',
     source: 'sample',
-    filePath: 'books/sample.epub',
+    filePath: '/mock/books/sample.epub',
   },
 ]
+
+vi.mock('../lib/books/samples', () => ({
+  listSampleBooks: () => samples,
+}))
 
 const TXT = 'A'.repeat(900) + 'SECOND PAGE'
 
@@ -105,9 +109,6 @@ beforeEach(async () => {
     'fetch',
     vi.fn(async (url: string) => {
       const u = String(url)
-      if (u.endsWith('books.json')) {
-        return { ok: true, json: async () => samples }
-      }
       if (u.endsWith('books/sample.txt')) {
         return {
           ok: true,
@@ -189,22 +190,12 @@ describe('ReaderPage', () => {
     )
   })
 
-  it('opens a local book when books.json fetch fails', async () => {
+  it('opens a local book alongside samples', async () => {
     const file = new File([TXT], 'mine.txt', { type: 'text/plain' })
     const meta = await booksStore.addLocal(file, 'Local Book')
-    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
-    vi.stubGlobal(
-      'fetch',
-      vi.fn(async (url: string) => {
-        if (String(url).endsWith('books.json')) throw new Error('network down')
-        return { ok: false, status: 404, blob: async () => new Blob([]) }
-      }),
-    )
     renderRead(meta.id)
     expect(
       await screen.findByRole('heading', { name: 'Local Book' }),
     ).toBeInTheDocument()
-    expect(warn).toHaveBeenCalled()
-    warn.mockRestore()
   })
 })

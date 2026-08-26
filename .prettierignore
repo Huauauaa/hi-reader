@@ -1,4 +1,4 @@
 dist
 coverage
-public/books
+src/books
 pnpm-lock.yaml

@@ -68,12 +68,13 @@ Highlights and in-text quotes are not available for PDF in this version.
 
 ## Sample books attribution
 
-Bundled samples under `public/books/` are for demo only:
+Bundled samples: drop `.pdf` / `.txt` / `.epub` files into `src/books/`.
+They are discovered at build time via `import.meta.glob` (no manifest).
 
-| File          | Source                                                                                                                                                           |
-| ------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `sample.txt`  | Excerpt from _论语·学而_ (public domain) and the opening of _A Tale of Two Cities_ by Charles Dickens ([Project Gutenberg](https://www.gutenberg.org/ebooks/98)) |
-| `sample.pdf`  | Generated placeholder (“示例 PDF”) via `scripts/gen-samples.mjs`                                                                                                 |
-| `sample.epub` | Generated minimal EPUB (“示例 EPUB”) via `scripts/gen-samples.mjs`                                                                                               |
+| File             | Source                                                                                                                                                           |
+| ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `示例 TXT.txt`   | Excerpt from _论语·学而_ (public domain) and the opening of _A Tale of Two Cities_ by Charles Dickens ([Project Gutenberg](https://www.gutenberg.org/ebooks/98)) |
+| `示例 PDF.pdf`   | Generated placeholder (“示例 PDF”) via `scripts/gen-samples.mjs`                                                                                                 |
+| `示例 EPUB.epub` | Generated minimal EPUB (“示例 EPUB”) via `scripts/gen-samples.mjs`                                                                                               |
 
 Regenerate PDF/EPUB samples: `node scripts/gen-samples.mjs`

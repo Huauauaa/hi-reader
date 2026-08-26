@@ -4,34 +4,28 @@ import { loadCatalog, filterByTitle } from '../lib/books/catalog'
 import { booksStore, clearAllBooksForTests } from '../lib/books/store'
 import type { BookMeta } from '../types/book'
 
-const samples: BookMeta[] = [
-  {
-    id: 'sample-txt',
-    title: '示例 TXT',
-    format: 'txt',
-    source: 'sample',
-    filePath: 'books/sample.txt',
-  },
-  {
-    id: 'sample-pdf',
-    title: '示例 PDF',
-    format: 'pdf',
-    source: 'sample',
-    filePath: 'books/sample.pdf',
-  },
-]
+vi.mock('../lib/books/samples', () => ({
+  listSampleBooks: () =>
+    [
+      {
+        id: 'sample-txt',
+        title: '示例 TXT',
+        format: 'txt',
+        source: 'sample',
+        filePath: '/mock/sample.txt',
+      },
+      {
+        id: 'sample-pdf',
+        title: '示例 PDF',
+        format: 'pdf',
+        source: 'sample',
+        filePath: '/mock/sample.pdf',
+      },
+    ] satisfies BookMeta[],
+}))
 
 beforeEach(async () => {
   await clearAllBooksForTests()
-  vi.stubGlobal(
-    'fetch',
-    vi.fn(async (url: string) => {
-      if (String(url).endsWith('books.json')) {
-        return { ok: true, json: async () => samples }
-      }
-      throw new Error(`unexpected fetch: ${url}`)
-    }),
-  )
 })
 
 afterEach(() => {
@@ -58,64 +52,30 @@ it('loadCatalog merges samples then local', async () => {
   expect(catalog[2]).toMatchObject({ title: 'My Book', source: 'local' })
 })
 
-it('loadCatalog still returns local books if samples fetch fails', async () => {
-  const file = new File(['x'], 'mine.txt', { type: 'text/plain' })
-  await booksStore.addLocal(file, 'My Book')
-  const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
-  vi.stubGlobal(
-    'fetch',
-    vi.fn(async () => {
-      throw new Error('offline')
-    }),
-  )
+it('loadCatalog still returns samples when no local books', async () => {
   const catalog = await loadCatalog()
-  expect(catalog).toEqual([
-    expect.objectContaining({ title: 'My Book', source: 'local' }),
-  ])
-  expect(warn).toHaveBeenCalled()
-  warn.mockRestore()
+  expect(catalog.map((b) => b.id)).toEqual(['sample-txt', 'sample-pdf'])
 })
 
-it('skips broken sample cards and warns', async () => {
+it('skips broken local cards and warns', async () => {
   const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
-  vi.stubGlobal(
-    'fetch',
-    vi.fn(async (url: string) => {
-      if (String(url).endsWith('books.json')) {
-        return {
-          ok: true,
-          json: async () => [
-            {
-              id: 'ok',
-              title: 'Good',
-              format: 'txt',
-              source: 'sample',
-              filePath: 'books/ok.txt',
-            },
-            {
-              id: 'empty-title',
-              title: '',
-              format: 'txt',
-              source: 'sample',
-              filePath: 'books/x.txt',
-            },
-            { id: 'nopath', title: 'No path', format: 'txt', source: 'sample' },
-            {
-              id: 'bad-fmt',
-              title: 'Doc',
-              format: 'docx',
-              source: 'sample',
-              filePath: 'books/x.docx',
-            },
-            { not: 'a book' },
-          ],
-        }
-      }
-      throw new Error(`unexpected fetch: ${url}`)
-    }),
-  )
+  vi.spyOn(booksStore, 'listLocal').mockResolvedValueOnce([
+    {
+      id: 'ok',
+      title: 'Good',
+      format: 'txt',
+      source: 'local',
+    },
+    { id: 'empty-title', title: '', format: 'txt', source: 'local' },
+    {
+      id: 'bad-fmt',
+      title: 'Doc',
+      format: 'docx' as BookMeta['format'],
+      source: 'local',
+    },
+  ] as BookMeta[])
   const catalog = await loadCatalog()
-  expect(catalog.map((b) => b.id)).toEqual(['ok'])
+  expect(catalog.map((b) => b.id)).toEqual(['sample-txt', 'sample-pdf', 'ok'])
   expect(warn).toHaveBeenCalled()
   warn.mockRestore()
 })
